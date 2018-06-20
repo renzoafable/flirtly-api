@@ -1,0 +1,43 @@
+Stored procedures
+
+Features
+  User
+    Register*
+      > Validation (passport)
+      > Optional middleName, city, province
+      > /addUser (/)
+      > /addInterest
+      > Same as login
+      > Check if user exists (/)
+    Log in*
+      > Validation (get primary fields) (/)
+      > take userName and password for authentication (/)
+      > /login (/)
+    Chat*
+      > Validation (users must be in contact, message not empty)
+      > Add message to database
+      > body contains senderId, receiverId, message, now()
+      > /sendChat
+      > return success/error message
+    Add contact*
+      > Validation (Check if contact exists)
+      > Add to database
+      > /addContact
+        -> senderId, receiverId
+        * until receiver responds, request will be put at pending requests table
+      > /response
+        -> senderId, receiverId, confirmation bit
+        * delete request from pending requests
+        * response depends on confirmation bit
+          -> if 1, add to contacts table
+          -> if 0, delete request
+    Favorite
+      > Validation
+      > One-way relation
+    Settings
+      > Upload profile pic
+      > Validation
+      > Update user info
+      > 
+    Find match
+      > Get user interests then find matching interests from other users
