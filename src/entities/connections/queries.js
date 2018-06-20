@@ -1,6 +1,6 @@
 const queries = {
   requestConnection: `
-    INSERT INTO pending_connections (
+    INSERT INTO connections (
       senderID,
       senderName,
       receiverID,
@@ -13,19 +13,29 @@ const queries = {
       ?,
       ?,
       ?,
-      true,
+      ?,
       NOW()
     )
   `,
+  getConnections: `
+    SELECT * FROM connections WHERE senderID=? AND confirmed=1
+  `,
   getPendingConnectionOfUsers: `
-    SELECT * FROM pending_connections WHERE senderID=? AND receiverID=?
+    SELECT * FROM connections WHERE senderID=? AND receiverID=? AND confirmed=0
   `,
   getSentConnections: `
-    SELECT * FROM pending_connections WHERE senderID=?
+    SELECT * FROM connections WHERE senderID=?
   `,
   getReceivedConnections: `
-    SELECT * FROM pending_connections WHERE receiverID=?
-  `
+    SELECT * FROM connections WHERE receiverID=?
+  `,
+  approveReceivedConnections: `
+    UPDATE connections
+    SET 
+      confirmed=TRUE
+    WHERE
+      senderID=? AND receiverID=?
+  `,
 };
 
 module.exports = queries;

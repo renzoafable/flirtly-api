@@ -55,30 +55,14 @@ CREATE TABLE interests (
   connections table contains all user selected connections
   these are the users that the selected user wanted to match with
 */
+
 CREATE TABLE connections (
   connectionID INT NOT NULL AUTO_INCREMENT,
-  userID INT NOT NULL,
-  friendID INT NOT NULL,
-  time DATETIME NOT NULL,
-  CONSTRAINT `connection_userID_fk`
-    FOREIGN KEY (userID)
-    REFERENCES users(`userID`)
-    ON DELETE CASCADE,
-  CONSTRAINT `friend_friendID_fk`
-    FOREIGN KEY (friendID)
-    REFERENCES users(userID)
-    ON DELETE CASCADE,
-  CONSTRAINT `connection_pk`
-    PRIMARY KEY (connectionID)
-);
-
-CREATE TABLE pending_connections (
-  pending_connectionID INT NOT NULL AUTO_INCREMENT,
   senderID INT NOT NULL,
   senderName VARCHAR (60) NOT NULL,
   receiverID INT NOT NULL,
   receiverName VARCHAR (60) NOT NULL,
-  confirmed BOOLEAN DEFAULT FALSE,
+  confirmed BOOLEAN NOT NULL DEFAULT 0,
   dateAdded TIMESTAMP NOT NULL,
   CONSTRAINT `user_senderID_fk`
     FOREIGN KEY (senderID)
@@ -89,7 +73,7 @@ CREATE TABLE pending_connections (
     REFERENCES users(userID)
     ON DELETE CASCADE,
   CONSTRAINT `pending_connectionID_pk`
-    PRIMARY KEY (pending_connectionID)
+    PRIMARY KEY (connectionID)
 );
 
 -- TODO:
