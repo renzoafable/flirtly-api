@@ -19,7 +19,7 @@ exports.addInterest = function({userID, interests}) {
   interests.split(',').forEach(interest => {
     interest = interest.replace(/^[ ]+|[ ]+$/g,''); // remove leading and trailing whitespaces
     promises.push(new Promise((resolve, reject) => {
-      db.query(addInterest, [userID, interest], (err, result) => {
+      db.query(interestQueries.addInterest, [userID, interest], (err, result) => {
         if (err) {
           console.log(err.message);
           return reject(500);

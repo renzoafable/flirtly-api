@@ -1,40 +1,27 @@
 const queries = {
   requestConnection: `
-    INSERT INTO connections (
-      senderID,
-      senderName,
-      receiverID,
-      receiverName,
-      confirmed,
-      dateAdded
-    )
-    VALUES (
-      ?,
-      ?,
-      ?,
-      ?,
-      ?,
-      NOW()
-    )
+    CALL requestConnection(?,?)
   `,
-  getConnections: `
-    SELECT * FROM connections WHERE senderID=? AND confirmed=1
+  getPendingRequest: `
+    SELECT * FROM connections WHERE connectionID=? AND userID=? AND confirmed=0
   `,
-  getPendingConnectionOfUsers: `
-    SELECT * FROM connections WHERE senderID=? AND receiverID=? AND confirmed=0
+  getConnectionsOfUser: `
+    SELECT connectionID AS User_ID, connectionName AS User_Name, dateAdded FROM connections WHERE userID=? AND confirmed=1
+  `,
+  getConnectionOfUser: `
+    SELECT * FROM connections WHERE userID=? AND connectionID=? AND confirmed=1
+  `,
+  getAllConnections: `
+    CALL getAllConnections(?,?)
   `,
   getSentConnections: `
-    SELECT * FROM connections WHERE senderID=?
+    SELECT connectionID, connectionName, confirmed, dateAdded FROM connections WHERE userID=?
   `,
   getReceivedConnections: `
-    SELECT * FROM connections WHERE receiverID=?
+    SELECT userID, userName, confirmed, dateAdded FROM connections WHERE connectionID=?
   `,
   approveReceivedConnections: `
-    UPDATE connections
-    SET 
-      confirmed=TRUE
-    WHERE
-      senderID=? AND receiverID=?
+    CALL approveReceivedConnection(?,?)
   `,
 };
 

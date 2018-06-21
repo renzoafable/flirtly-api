@@ -17,7 +17,7 @@ router.post('/add', (req, res, next) => {
   const { userID } = req.session.user;
   const { interests } = req.body;
   const args = { userID, interests };
-
+  console.log(args);
   Promise.all(addInterest(args))
     .then(() => {
       getUserWithInterests(userID)
