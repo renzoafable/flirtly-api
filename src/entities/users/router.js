@@ -3,6 +3,7 @@ const router = express.Router();
 
 const connectionRouter = require('../connections/router');
 const messageRouter = require('../messages/router');
+const interestRouter = require('../interests/router');
 
 const Ctrl = require('./controller');
 const getUsers = Ctrl.getUsers;
@@ -14,7 +15,7 @@ router.get('/', (req, res, next) => {
     .then(values => {
       users = values;
 
-      // users.map(user => delete user.password);
+      users.map(user => delete user.password);
 
       res.status(200).json({
         status: 200,
@@ -72,5 +73,6 @@ router.delete('/', (req, res, next) => {
 
 router.use('/connection', connectionRouter);
 router.use('/message', messageRouter);
+router.use('/interest', interestRouter);
 
 module.exports = router;

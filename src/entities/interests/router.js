@@ -18,17 +18,12 @@ router.post('/add', (req, res, next) => {
   const args = { userID: user.userID, interests };
   Promise.all(addInterest(args))
     .then((result) => {
-      // if (!result[0]) return reject(503);
       res.status(200).json({
         status: 200,
         message: 'Successfully added interest/s',
         'interest/s': result
       });
-      // return getUserWithInterests(user);
     })
-    // .then(result => {
-    //   console.log(result);
-    // })
     .catch(err => {
       let message = '';
 
@@ -60,7 +55,7 @@ router.get('/', (req, res, next) => {
       let message = '';
 
       switch(err) {
-        case 500:
+        case 500:a
           message = 'Internal server error while fetching interests'
           break;
         default:
