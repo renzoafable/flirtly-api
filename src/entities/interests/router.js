@@ -4,7 +4,6 @@ const router = express.Router();
 const Ctrl = require('./controller');
 const getInterests = Ctrl.getInterests;
 const addInterest = Ctrl.addInterest;
-const getUserWithInterests = Ctrl.getUserWithInterests;
 
 /*
   TODO
@@ -14,34 +13,22 @@ const getUserWithInterests = Ctrl.getUserWithInterests;
 */
 
 router.post('/add', (req, res, next) => {
-  const { userID } = req.session.user;
+  const { user } = req.session;
   const { interests } = req.body;
-  const args = { userID, interests };
-  console.log(args);
+  const args = { userID: user.userID, interests };
   Promise.all(addInterest(args))
-    .then(() => {
-      getUserWithInterests(userID)
-        .then(result => {
-          res.status(200).json({
-            status: 200,
-            message: 'Successfully added user interests',
-            data: result
-          });
-        })
-        .catch(err => {
-          let message = '';
-
-          switch(err) {
-            case 500:
-              message = 'Internal server error while adding user interests';
-              break;
-            default:
-              break;
-          }
-
-          res.status(err).json({ status: err, message });
-        });
+    .then((result) => {
+      // if (!result[0]) return reject(503);
+      res.status(200).json({
+        status: 200,
+        message: 'Successfully added interest/s',
+        'interest/s': result
+      });
+      // return getUserWithInterests(user);
     })
+    // .then(result => {
+    //   console.log(result);
+    // })
     .catch(err => {
       let message = '';
 
@@ -49,6 +36,8 @@ router.post('/add', (req, res, next) => {
         case 500:
           message = 'Internal server error while adding interest';
           break;
+        case 503:
+          message = 'Something went wrong!';
         default:
           break;
       }
@@ -58,8 +47,8 @@ router.post('/add', (req, res, next) => {
 });
 
 router.get('/', (req, res, next) => {
-  let { userID } = req.session.user;
-  getInterests(userID)
+  let { user } = req.session;
+  getInterests(user)
     .then(values => {
       res.status(200).json({
         status: 200,
@@ -81,6 +70,5 @@ router.get('/', (req, res, next) => {
       res.status(err).json({ status: err, message });
     });
 });
-
 
 module.exports = router;

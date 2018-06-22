@@ -45,13 +45,15 @@ CREATE TABLE users (
 CREATE TABLE interests (
   interestID INT NOT NULL AUTO_INCREMENT,
   userID INT NOT NULL,
-  interest VARCHAR (60) NOT NULL,
+  interest VARCHAR (255) NOT NULL,
   CONSTRAINT `interest_userID_fk`
     FOREIGN KEY (userID)
     REFERENCES users(`userID`)
     ON DELETE CASCADE,
   CONSTRAINT `interest_pk`
-    PRIMARY KEY (interestID)
+    PRIMARY KEY (interestID),
+  CONSTRAINT `interest_uk`
+    UNIQUE KEY (interest)
 );
 
 /* 
@@ -144,10 +146,11 @@ CREATE PROCEDURE addInterest (
 )
 BEGIN
   INSERT INTO interests VALUES (
+    NULL,
     userID,
     interest
   );
-  SELECT LAST_INSERT_ID();
+  SELECT interestID, interest FROM interests WHERE interests.interest=interest;
 END;
 $$
 DELIMITER ;

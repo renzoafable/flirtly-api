@@ -1,16 +1,13 @@
 const queries = {
   addInterest: `CALL addInterest(?,?)`,
   getUserWithInterests: `
-    SELECT 
-      GROUP_CONCAT(interests.interest) as Interests
+    SELECT
+      interestID,
+      interest
     FROM
-      users,
       interests
     WHERE
-      users.userID=?
-      AND users.userID=interests.userID
-    GROUP BY
-      users.userID
+      interests.userID=?
   `,
 };
 

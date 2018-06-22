@@ -1,7 +1,7 @@
 const db = require('../../database/index');
 const interestQueries = require('./queries');
 
-exports.getInterests = function(userID) {
+exports.getInterests = function({userID}) {
   return new Promise((resolve, reject) => {
     db.query(interestQueries.getUserWithInterests, userID, (err, results) => {
       if (err) {
@@ -9,7 +9,7 @@ exports.getInterests = function(userID) {
         return reject(500);
       }
 
-      return resolve(results[0]);
+      return resolve(results);
     });
   });
 }
@@ -25,23 +25,10 @@ exports.addInterest = function({userID, interests}) {
           return reject(500);
         }
 
-        return resolve(result);
+        return resolve(result[0][0]);
       });
     }));
   });
   
   return promises;
-}
-
-exports.getUserWithInterests = function(userID) {
-  return new Promise((resolve, reject) => {
-    db.query(interestQueries.getUserWithInterests, userID, (err, result) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-
-      return resolve(result[0]);
-    });
-  });
 }
