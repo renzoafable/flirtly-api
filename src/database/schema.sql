@@ -43,12 +43,15 @@ CREATE TABLE users (
 );
 
 CREATE TABLE interests (
+  interestID INT NOT NULL AUTO_INCREMENT,
   userID INT NOT NULL,
   interest VARCHAR (60) NOT NULL,
   CONSTRAINT `interest_userID_fk`
     FOREIGN KEY (userID)
     REFERENCES users(`userID`)
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
+  CONSTRAINT `interest_pk`
+    PRIMARY KEY (interestID)
 );
 
 /* 
