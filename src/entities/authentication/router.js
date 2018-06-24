@@ -1,13 +1,13 @@
-const express = require('express');
-const bcrypt = require('bcrypt');
+const express = require("express");
+const bcrypt = require("bcrypt");
 const router = express.Router();
 
-const Ctrl = require('./controller');
+const Ctrl = require("./controller");
 const signin = Ctrl.signin;
 const signup = Ctrl.signup;
 const getUserByUserID = Ctrl.getUserByUserID;
 
-router.post('/signup', (req, res, next) => {
+router.post("/signup", (req, res, next) => {
   let user;
 
   bcrypt.hash(req.body.password, 10, (err, result) => {
@@ -24,20 +24,20 @@ router.post('/signup', (req, res, next) => {
 
             res.status(200).json({
               status: 200,
-              message: 'Successfully created user',
+              message: "Successfully created user",
               user: user
             });
           })
           .catch(err => {
-            let message = '';
+            let message = "";
 
-            switch(err) {
+            switch (err) {
               case 500:
-                message = 'Internal server error in fetching created user';
+                message = "Internal server error in fetching created user";
                 break;
               case 404:
-                message = 'Created user not found';
-                break
+                message = "Created user not found";
+                break;
               default:
                 break;
             }
@@ -46,11 +46,11 @@ router.post('/signup', (req, res, next) => {
           });
       })
       .catch(err => {
-        let message = '';
-        
+        let message = "";
+
         switch (err) {
           case 500:
-            message = 'Internal server error in adding user';
+            message = "Internal server error in adding user";
             break;
         }
 
@@ -59,15 +59,16 @@ router.post('/signup', (req, res, next) => {
   });
 });
 
-router.post('/signin', (req, res, next) => {
-  if (req.session.user) {
+router.post("/signin", (req, res, next) => {
+  const { user } = req.session;
+  const { username } = req.body;
+  if (user.username === username) {
     res.status(403).json({
       status: 403,
-      message: 'Already logged in',
+      message: "Already logged in",
       loggedUser: req.session.user
     });
-  }
-  else {
+  } else {
     signin(req.body)
       .then(result => {
         const user = result;
@@ -77,19 +78,19 @@ router.post('/signin', (req, res, next) => {
 
         res.status(200).json({
           status: 200,
-          message: 'Successfully logged in',
-          user: user,
+          message: "Successfully logged in",
+          user: user
         });
       })
       .catch(err => {
-        let message = '';
+        let message = "";
 
-        switch(err) {
+        switch (err) {
           case 500:
-            message = 'Internal server error';
+            message = "Internal server error";
             break;
           case 400:
-            message = 'Invalid credentials';
+            message = "Invalid credentials";
             break;
           default:
             break;
@@ -100,33 +101,32 @@ router.post('/signin', (req, res, next) => {
   }
 });
 
-router.post('/signout', (req, res, next) => {
+router.post("/signout", (req, res, next) => {
   try {
     if (!req.session.user) {
       res.status(400).json({
         status: 400,
-        message: 'No user is logged in'
+        message: "No user is logged in"
       });
-    }
-    else {
+    } else {
       req.session.destroy();
       res.status(200).json({
         status: 200,
-        message: 'Successfully logged out'
+        message: "Successfully logged out"
       });
     }
   } catch (err) {
     res.status(500).json({
       status: 500,
-      message: 'Internal server error while logging out'
+      message: "Internal server error while logging out"
     });
   }
 });
 
-router.post('/session', (req, res, next) => {
+router.post("/session", (req, res, next) => {
   res.status(200).json({
     status: 200,
-    message: 'Successfully fetched current session',
+    message: "Successfully fetched current session",
     session: req.session.user ? req.session.user : null
   });
 });
