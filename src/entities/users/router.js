@@ -11,7 +11,8 @@ const deleteUser = Ctrl.deleteUser;
 
 router.get('/', (req, res, next) => {
   let users;
-  getUsers()
+  let { user } = req.session;
+  getUsers(user)
     .then(values => {
       users = values;
 

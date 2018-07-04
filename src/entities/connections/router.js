@@ -57,10 +57,11 @@ router.post('/send/:userID', isSameUser, (req, res, next) => {
       }
       else return requestConnection(userID, connectionID);
     })
-    .then(() => {
+    .then(result => {
       res.status(200).json({
         status: 200,
         message: 'Successfully sent connection request',
+        users: result
       });
     })
     .catch(err => {

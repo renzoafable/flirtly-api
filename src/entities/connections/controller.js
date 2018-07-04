@@ -8,8 +8,7 @@ exports.requestConnection = function(userID, connectionID) {
         console.log(err.message);
         return reject(500);
       }
-
-      return resolve();
+      return resolve(result[0]);
     });
   });
 }

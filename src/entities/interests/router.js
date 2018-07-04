@@ -21,7 +21,7 @@ router.post('/add', (req, res, next) => {
       res.status(200).json({
         status: 200,
         message: 'Successfully added interest/s',
-        'interest/s': result
+        data: result
       });
     })
     .catch(err => {

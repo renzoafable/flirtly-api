@@ -9,9 +9,9 @@ const defaultAttr = {
   province: '',
 };
 
-exports.getUsers = function() {
+exports.getUsers = function({userID}) {
   return new Promise((resolve, reject) => {
-    db.query(userQueries.getUsers, (err, results) => {
+    db.query(userQueries.getUsers, userID,(err, results) => {
       if (err) {
         console.log(err.message);
         return reject(500);

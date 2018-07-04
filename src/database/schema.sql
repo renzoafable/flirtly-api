@@ -171,6 +171,7 @@ BEGIN
     FALSE,
     NOW()
   );
+  CALL getUsers(userID);
 END;
 $$
 DELIMITER ;
@@ -241,6 +242,19 @@ BEGIN
     message,
     NOW()
   );
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS getUsers;
+DELIMITER $$
+CREATE PROCEDURE getUsers (
+  userID INT
+)
+BEGIN
+  SELECT u.*, confirmed 
+  FROM users u LEFT JOIN connections c 
+  ON u.userID = c.connectionID WHERE u.userID != userID;
 END;
 $$
 DELIMITER ;
