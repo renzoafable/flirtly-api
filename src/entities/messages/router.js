@@ -4,7 +4,7 @@ const router = express.Router();
 const isSameUser = require('../middlewares/middleware').isSameUser;
 
 const Ctrl = require('./controller');
-const getConnectionOfUser = require('../connections/controller').getConnectionOfUser;
+const getApprovedConnectionOfUser = require('../connections/controller').getApprovedConnectionOfUser;
 const getMessages = Ctrl.getMessages;
 const getSentMessages = Ctrl.getSentMessages;
 const getReceivedMessages = Ctrl.getReceivedMessages;
@@ -97,7 +97,7 @@ router.post('/send/:userID', isSameUser, (req, res, next) => {
   const { message } = req.body;
 
 
-  getConnectionOfUser(user, receiverID)
+  getApprovedConnectionOfUser(user, receiverID)
     .then(() => {
       return sendMessage(senderID, receiverID, message);
     })

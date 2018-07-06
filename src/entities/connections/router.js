@@ -8,8 +8,10 @@ const getAllConnections = Ctrl.getAllConnections;
 const getSentConnections = Ctrl.getSentConnections;
 const getReceivedConnections = Ctrl.getReceivedConnections;
 const getConnectionsOfUser = Ctrl.getConnectionsOfUser;
+const getConnectionOfUser = Ctrl.getConnectionOfUser;
 const approveReceivedConnections = Ctrl.approveReceivedConnections;
 const getPendingRequest = Ctrl.getPendingRequest;
+const deleteRequest = Ctrl.deleteRequest;
 
 const isSameUser = require('../middlewares/middleware').isSameUser;
 
@@ -90,7 +92,6 @@ router.put('/approve/:userID', (req, res, next) => {
   let { userID } = req.params;
   userID = parseInt(userID);
 
-  let receivedConnection;
   getPendingRequest(user.userID, userID)
     .then(result => {
       if (result) {
@@ -101,10 +102,13 @@ router.put('/approve/:userID', (req, res, next) => {
       return Promise.reject(404);
     })
     .then(() => {
+      return getReceivedConnections(user);
+    })
+    .then(result => {
       res.status(200).json({
         status: 200,
         message: 'Successfully approved connection request',
-        request: receivedConnection
+        data: result
       });
     })
     .catch(err => {
@@ -150,6 +154,42 @@ router.get('/sent', (req, res, next) => {
     })
 });
 
+router.delete('/sent/delete/:connectionID', (req, res, next) => {
+  const { user } = req.session;
+  const { connectionID } = req.params;
+
+  getConnectionOfUser(user, connectionID)
+    .then(result => {
+      const { userID, connectionID } = result;
+
+      return deleteRequest(userID, connectionID);
+    })
+    .then(() => {
+      return getSentConnections(user);
+    })
+    .then(result => {
+      res.status(200).json({
+        status: 200,
+        message: 'Successfully canceled request',
+        data: result || null
+      });
+    })
+    .catch(err => {
+      let message = '';
+
+      switch (err) {
+        case 500:
+          message = 'Internal server error while deleting request';
+          break;
+        case 404:
+          message = 'Connection does not exist';
+          break;
+      }
+
+      res.status(err).json({ status: err, message });
+    });
+});
+
 router.get('/received', (req, res, next) => {
   const { user } = req.session;
   getReceivedConnections(user)
@@ -166,6 +206,41 @@ router.get('/received', (req, res, next) => {
       switch (err) {
         case 500:
           message = 'Internal server error while fetching received connection requests';
+          break;
+        default:
+          break;
+      }
+
+      res.status(err).json({ status: err, message });
+    });
+});
+
+router.delete('/received/delete/:userID', (req, res, next) => {
+  const { user } = req.session;
+  const { userID } = req.params;
+
+  getConnectionOfUser({userID}, user.userID)
+    .then(result => {
+      const { userID, connectionID } = result;
+
+      return deleteRequest(userID, connectionID);
+    })
+    .then(() => {
+      return getReceivedConnections(user);
+    })
+    .then(result => {
+      res.status(200).json({
+        status: 200,
+        message: 'Successfully deleted pending request',
+        data: result
+      })
+    })
+    .catch(err => {
+      let message = '';
+
+      switch (err) {
+        case 500: 
+          message = 'Iternal server error while deleting request';
           break;
         default:
           break;

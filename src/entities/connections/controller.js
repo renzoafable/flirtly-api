@@ -80,6 +80,21 @@ exports.getConnectionOfUser = function({userID: senderID}, receiverID) {
   });
 }
 
+exports.getApprovedConnectionOfUser = function({userID: senderID}, receiverID) {
+  return new Promise((resolve, reject) => {
+    db.query(connectionQueries.getApprovedConnection, [senderID, receiverID], (err, result) => {
+      if (err) {
+        console.log(err.message);
+        return reject(500);
+      }
+    
+      else if(!result.length) return reject(404);
+
+      return resolve(result[0]);
+    });
+  });
+}
+
 exports.approveReceivedConnections = function({userID: receiverID}, senderID) {
   return new Promise((resolve, reject) => {
     db.query(connectionQueries.approveReceivedConnections, [receiverID, senderID], (err, results) => {
@@ -103,5 +118,18 @@ exports.getPendingRequest = function(connectionID, userID) {
 
       return resolve(results[0]);
     });
+  });
+}
+
+exports.deleteRequest = function(userID, connectionID) {
+  return new Promise((resolve, reject) => {
+    db.query(connectionQueries.deleteConnection, [userID, connectionID], (err, result) => {
+      if (err) {
+        console.log(err.message);
+        return reject(500);
+      }
+
+      return resolve(result);
+    })
   });
 }

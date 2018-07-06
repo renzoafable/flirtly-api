@@ -51,9 +51,7 @@ CREATE TABLE interests (
     REFERENCES users(`userID`)
     ON DELETE CASCADE,
   CONSTRAINT `interest_pk`
-    PRIMARY KEY (interestID),
-  CONSTRAINT `interest_uk`
-    UNIQUE KEY (interest)
+    PRIMARY KEY (interestID)
 );
 
 /* 
@@ -252,7 +250,7 @@ CREATE PROCEDURE getUsers (
   userID INT
 )
 BEGIN
-  SELECT u.*, confirmed 
+  SELECT DISTINCT u.*, confirmed 
   FROM users u LEFT JOIN connections c 
   ON u.userID = c.connectionID WHERE u.userID != userID;
 END;
@@ -261,6 +259,16 @@ DELIMITER ;
 
 
 /* MOCK USERS */
-CALL addUser("lbafable", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Lorenz", "Bernardo", "Afable", "09178774953", "lbafable@up.edu.ph", "male", "ahsjgdajshdg", "jahsdkjashdjkas");
-CALL addUser("cbcortez", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Lorenz", "Bernardo", "Afable", "09178774953", "cbcortez@up.edu.ph", "male", "ahsjgdajshdg", "jahsdkjashdjkas");
-CALL addUser("hproxas", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Lorenz", "Bernardo", "Afable", "09178774953", "hproxas@up.edu.ph", "male", "ahsjgdajshdg", "jahsdkjashdjkas");
+CALL addUser("lbafable", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Lorenz", "Bernardo", "Afable", "09178774953", "lbafable@up.edu.ph", "male", "Pasig City", "NCR");
+CALL addUser("cbcortez", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Clarisse Sydney", "Ballesteros", "Cortez", "09178774953", "cbcortez@up.edu.ph", "female", "Taguig City", "NCR");
+CALL addUser("mjasminez", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Mikee", "", "Jasminez", "09178774953", "mjasminez@admu.edu.ph", "female", "Pasig", "NCR");
+CALL addUser("rbafable", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Ralph", "Bernardo", "Afable", "09178774953", "rbafable@admu.edu.ph", "male", "Borongan", "Eastern Samar");
+CALL addUser("mbafable", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Marianne Angela", "Bernardo", "Afable", "09178774953", "mbafable@admu.edu.ph", "female", "Borongan City", "Eastern Samar");
+CALL addUser("hproxas", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Harold James", "Platon", "Roxas", "09178774953", "hproxas@up.edu.ph", "male", "Tanauan City", "Batangas");
+CALL addUser("dabenavidez", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "David Ralph", "", "Benavidez", "09178774953", "dabenavidez@up.edu.ph", "male", "Calamba City", "Laguna");
+CALL addUser("mark", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Mark", "", "Aldecimo", "09178774953", "mark@up.edu.ph", "male", "Calamba City", "Laguna");
+CALL addUser("carlo", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Carlo", "", "De Guzman", "09178774953", "carlo@up.edu.ph", "male", "Calamba City", "Laguna");
+CALL addUser("ej", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "EJ", "", "Villadarez", "09178774953", "ej@up.edu.ph", "female", "Calamba City", "Laguna");
+CALL addUser("jerome", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Jerome", "", "Davadilla", "09178774953", "jerome@up.edu.ph", "male", "Calamba City", "Laguna");
+CALL addUser("pduts", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Rodrigo", "", "Duterte", "09178774953", "pduts@up.edu.ph", "male", "Calamba City", "Laguna");
+CALL addUser("liza", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Liza", "", "Soberano", "09178774953", "liza@up.edu.ph", "female", "Calamba City", "Laguna");
