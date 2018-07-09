@@ -1,5 +1,6 @@
 const userCtrl = function(repo) {
   const controller = {
+    // get /user controller
     getUsers: (req, res) => {
       let users;
       let { user } = req.session;
@@ -39,6 +40,7 @@ const userCtrl = function(repo) {
         });
     },
 
+    // delete /user controller
     deleteUser: (req, res) => {
       let { user } = req.session;
 
