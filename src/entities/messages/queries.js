@@ -11,6 +11,9 @@ const queries = {
   sendMessage: `
     CALL sendMessage(?,?,?)
   `,
+  getChats: `
+    CALL getChats(?,?)
+  `,
 };
 
 module.exports = queries;

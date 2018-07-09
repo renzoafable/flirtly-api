@@ -33,3 +33,21 @@ exports.deleteUser = function({userID}) {
     });
   });
 }
+
+exports.getUsersWithInterests = function(users) {
+  const promises = [];
+  users.forEach(user => {
+    promises.push(new Promise((resolve, reject) => {
+      db.query(userQueries.getUserWithInterests, user.userID, (err, result) => {
+        if (err) {
+          console.log(err.message);
+          return reject(500);
+        }
+
+        return resolve(result);
+      });
+    }));
+  });
+
+  return promises;
+}

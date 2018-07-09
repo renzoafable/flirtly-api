@@ -32,3 +32,16 @@ exports.addInterest = function({userID, interests}) {
   
   return promises;
 }
+
+exports.deleteInterest = function({ userID }, interestID) {
+  return new Promise((resolve, reject) => {
+    db.query(interestQueries.deleteInterest, [userID, interestID], (err, result) => {
+      if (err) {
+        console.log(err.message);
+        return reject(500);
+      }
+
+      return resolve(result);
+    });
+  });
+}

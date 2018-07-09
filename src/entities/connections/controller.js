@@ -54,7 +54,7 @@ exports.getReceivedConnections = function({userID}) {
 
 exports.getConnectionsOfUser = function({userID}) {
   return new Promise((resolve, reject) => {
-    db.query(connectionQueries.getConnectionsOfUser, userID, (err, results) => {
+    db.query(connectionQueries.getConnectionsOfUser, [userID, userID], (err, results) => {
       if (err) {
         console.log(err.message);
         return reject(500);

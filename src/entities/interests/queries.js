@@ -2,6 +2,7 @@ const queries = {
   addInterest: `CALL addInterest(?,?)`,
   getUserWithInterests: `
     SELECT
+      userID,
       interestID,
       interest
     FROM
@@ -9,6 +10,9 @@ const queries = {
     WHERE
       interests.userID=?
   `,
+  deleteInterest: `
+  DELETE FROM interests WHERE userID=? AND interestID=?
+  `
 };
 
 module.exports = queries;

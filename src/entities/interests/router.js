@@ -4,6 +4,7 @@ const router = express.Router();
 const Ctrl = require('./controller');
 const getInterests = Ctrl.getInterests;
 const addInterest = Ctrl.addInterest;
+const deleteInterest = Ctrl.deleteInterest;
 
 /*
   TODO
@@ -57,6 +58,32 @@ router.get('/', (req, res, next) => {
       switch(err) {
         case 500:a
           message = 'Internal server error while fetching interests'
+          break;
+        default:
+          break;
+      }
+
+      res.status(err).json({ status: err, message });
+    });
+});
+
+router.delete('/delete/:interestID', (req, res, next) => {
+  const { user } = req.session;
+  const { interestID } = req.params;
+
+  deleteInterest(user, interestID)
+    .then(result => {
+      res.status(200).json({
+        status: 200,
+        message: 'Successfully deleted interest'
+      });
+    })
+    .catch(err => {
+      let message = '';
+
+      switch (err) {
+        case 500:
+          message = 'Internal server erro while deleting interest';
           break;
         default:
           break;

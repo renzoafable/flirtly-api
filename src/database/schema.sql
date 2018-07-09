@@ -234,9 +234,9 @@ BEGIN
   INSERT INTO messages
   VALUES (
     senderID,
-    (SELECT username FROM users WHERE users.userID=senderID),
+    (SELECT GROUP_CONCAT(firstName) FROM users WHERE users.userID=senderID GROUP BY users.userID),
     receiverID,
-    (SELECT username FROM users WHERE users.userID=receiverID),
+    (SELECT GROUP_CONCAT(firstName) FROM users WHERE users.userID=receiverID),
     message,
     NOW()
   );
@@ -250,9 +250,26 @@ CREATE PROCEDURE getUsers (
   userID INT
 )
 BEGIN
-  SELECT DISTINCT u.*, confirmed 
-  FROM users u LEFT JOIN connections c 
-  ON u.userID = c.connectionID WHERE u.userID != userID;
+  SELECT DISTINCT u.*, c.confirmed 
+  FROM users u 
+  LEFT JOIN connections c 
+  ON u.userID = c.connectionID
+  WHERE u.userID != userID;
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS getChats;
+DELIMITER $$
+CREATE PROCEDURE getChats (
+  userID INT,
+  connectionID INT
+)
+BEGIN
+  SELECT * FROM messages
+  WHERE messages.senderID IN (userID, connectionID) 
+  AND messages.receiverID IN (userID, connectionID)
+  ORDER BY messages.timeSent;
 END;
 $$
 DELIMITER ;

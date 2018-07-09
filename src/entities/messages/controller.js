@@ -52,3 +52,16 @@ exports.sendMessage = function(senderID, receiverID, message) {
     });
   });
 }
+
+exports.getChats = function({userID}, connectionID) {
+  return new Promise((resolve, reject) => {
+    db.query(messageQueries.getChats, [userID, connectionID], (err, results) => {
+      if (err) {
+        console.log(err.message);
+        return reject(500);
+      }
+
+      return resolve(results[0]);
+    });
+  });
+}
