@@ -85,10 +85,12 @@ CREATE TABLE messages (
   timeSent TIMESTAMP NOT NULL,
   CONSTRAINT `user_senderID_fk`
     FOREIGN KEY (senderID)
-    REFERENCES users(userID),
+    REFERENCES users(userID)
+    ON DELETE CASCADE,
   CONSTRAINT `user_receiverID_fk`
     FOREIGN KEY (receiverID)
     REFERENCES users(userID)
+    ON DELETE CASCADE
 );
 
 -- TODO:

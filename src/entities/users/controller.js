@@ -1,53 +1,78 @@
-const db = require('../../database/index');
-const userQueries = require('./queries');
+const userCtrl = function(repo) {
+  const controller = {
+    getUsers: (req, res) => {
+      let users;
+      let { user } = req.session;
 
-const formatUserBody = require('../../utilities');
+      repo.getUsers(user)
+        .then(result => {
+          users = result[0];
+          users.map(user => {
+            delete user.password;
+          });
 
-const defaultAttr = {
-  middleName: '',
-  city: '',
-  province: '',
-};
+          return Promise.all(repo.getUsersWithInterests(users));
+        })
+        .then(result => {
+          result.forEach((userInterests, i) => {
+            users[i].interests = userInterests;
+          });
 
-exports.getUsers = function({userID}) {
-  return new Promise((resolve, reject) => {
-    db.query(userQueries.getUsers, userID,(err, results) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-      return resolve(results);
-    });
-  });
+          res.status(200).json({
+            status: 200,
+            message: 'Successfully fetched uses',
+            data: users
+          })
+        })
+        .catch(err => {
+          let message = '';
+
+          switch (err) {
+            case 500:
+              message = 'Internal server error while fetching users';
+              break;
+            default:
+              break;
+          }
+
+          res.status(err).json({ status: err, message });
+        });
+    },
+
+    deleteUser: (req, res) => {
+      let { user } = req.session;
+
+      delete user.password;
+
+      repo.deleteUser(user)
+        .then(result => {
+          req.session.destroy();
+          res.status(200).json({
+            status: 200,
+            message: 'Successfully deleted user',
+            data: user
+          });
+        })
+        .catch(err => {
+          let message = '';
+
+          switch (err) {
+            case 500:
+              message = 'Internal server error while deleting user';
+              break;
+            case 404:
+              message = 'User does not exist';
+              break;
+            default:
+              break;
+          }
+
+          res.status(err).json({ status: err, message });
+        });
+    }
+  }
+
+  return controller;
 }
 
-exports.deleteUser = function({userID}) {
-  return new Promise((resolve, reject) => {
-    db.query(userQueries.deleteUser, userID, (err, results) => {
-      if (err) {
-        console.log(err.message);
-        reject(500);
-      }
-      else if (!results.affectedRows) return reject(404);
-      return resolve();
-    });
-  });
-}
-
-exports.getUsersWithInterests = function(users) {
-  const promises = [];
-  users.forEach(user => {
-    promises.push(new Promise((resolve, reject) => {
-      db.query(userQueries.getUserWithInterests, user.userID, (err, result) => {
-        if (err) {
-          console.log(err.message);
-          return reject(500);
-        }
-
-        return resolve(result);
-      });
-    }));
-  });
-
-  return promises;
-}
+module.exports = userCtrl;
