@@ -1,50 +1,122 @@
 const bcrypt = require('bcrypt');
 
-const db = require('../../database/index');
-const authQueries = require('./queries');
-
-const formatUserBody = require('../../utilities').formatUserBody;
-
-exports.signin = function({username, password}) {
-  return new Promise((resolve, reject) => {
-    db.query(authQueries.getUser, username, (err, result) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-      else if (!result.length) reject(400);
-      else {
-        bcrypt.compare(password, result[0].password, (err, isMatch) => {
-          if (err) reject(500);
-          else if (!isMatch) reject(400);
-          return resolve(result[0]);
+const authCtrl = function (repo) {
+  const controller = {
+    // /signin controller
+    signin: (req, res) => {
+      if (req.session.user) {
+        res.status(403).json({
+          status: 403,
+          message: 'Already logged in',
+          data: req.session.user
         });
       }
-    });
-  });
+      else {
+        repo.signin(req.body)
+          .then(result => {
+            const user = result;
+
+            delete user.password;
+            req.session.user = user;
+
+            res.status(200).json({
+              status: 200,
+              message: 'Successfully signed in',
+              data: user
+            });
+          })
+          .catch(err => {
+            let message = '';
+
+            switch (err) {
+              case 500:
+                message = 'Internal server error on sign in';
+                break;
+              case 400:
+                message = 'Invalid credentials';
+                break;
+              default:
+                break;
+            }
+
+            res.status(err).json({ status: err, message });
+          });
+      }
+    },
+
+    // /signup controller
+    signup: (req, res) => {
+      let user;
+
+      bcrypt.hash(req.body.password, 10, (err, result) => {
+        req.body.password = result;
+
+        repo.signup(req.body)
+          .then(value => {
+            const userID = value;
+
+            return repo.getUserByUserID(userID);
+          })
+          .then(result => {
+            user = result
+
+            delete user.password;
+
+            res.status(200).json({
+              status: 200,
+              message: 'Successfully created user',
+              data: user
+            });
+          })
+          .catch(err => {
+            let message = '';
+
+            switch (err) {
+              case 500:
+                message = 'Internal server error while creating user';
+                break;
+              case 404:
+                message = 'User not found';
+                break;
+              default:
+                break;
+            }
+
+            res.status(err).json({ status: err, message });
+          });
+      });
+    },
+
+    // /signout controller
+    signout: (req, res) => {
+      if (!req.session.user) {
+        res.status(400).json({
+          status: 400,
+          message: 'No user is signed in'
+        });
+      }
+
+      else  {
+        req.session.destroy();
+
+        res.status(200).json({
+          status: 200,
+          message: 'Successfully signed out user'
+        });
+      }
+    },
+
+    //  /session controller
+    getSession: (req, res) => {
+      res.status(200).json({
+        status: 200,
+        message: 'Successfully fetched session',
+        data: req.session.user ? req.session.user : null
+      })
+    }
+  }
+
+  return controller;
 }
 
-exports.signup = function(user) {
-  return new Promise((resolve, reject) => {
-    db.query(authQueries.addUser, formatUserBody(user), (err, results) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-      return resolve(results[0][0]['LAST_INSERT_ID()']);
-    });
-  });
-}
-
-exports.getUserByUserID = function(userID) {
-  return new Promise((resolve, reject) => {
-    db.query(authQueries.getUserByUserID, userID, (err, results) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-      else if (!results[0].length) reject(404);
-      return resolve(results[0][0]);
-    });
-  });
-}
+module.exports = authCtrl;
