@@ -1,20 +1,34 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
 const router = express.Router();
 
 const connectionRouter = require('../connections/router');
+const messageRouter = require('../messages/router');
+const interestRouter = require('../interests/router');
+
 const Ctrl = require('./controller');
 const getUsers = Ctrl.getUsers;
 const deleteUser = Ctrl.deleteUser;
+const getUsersWithInterests = Ctrl.getUsersWithInterests;
 
 router.get('/', (req, res, next) => {
   let users;
-  getUsers()
+  let { user } = req.session;
+  getUsers(user)
     .then(values => {
-      users = values;
+      users = values[0];
 
-      users.map(user => delete user.password);
+      users.map(user => {
+        delete user.password;
+      });
 
+      return Promise.all(getUsersWithInterests(users));
+
+    })
+    .then(result => {
+      result.forEach((userInterests, i) => {
+        users[i].interests = userInterests;
+      });
+      
       res.status(200).json({
         status: 200,
         message: 'Successfully fetched users',
@@ -70,5 +84,7 @@ router.delete('/', (req, res, next) => {
 });
 
 router.use('/connection', connectionRouter);
+router.use('/message', messageRouter);
+router.use('/interest', interestRouter);
 
 module.exports = router;

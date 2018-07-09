@@ -1,7 +1,7 @@
 const db = require('../../database/index');
 const interestQueries = require('./queries');
 
-exports.getInterests = function(userID) {
+exports.getInterests = function({userID}) {
   return new Promise((resolve, reject) => {
     db.query(interestQueries.getUserWithInterests, userID, (err, results) => {
       if (err) {
@@ -9,7 +9,7 @@ exports.getInterests = function(userID) {
         return reject(500);
       }
 
-      return resolve(results[0]);
+      return resolve(results);
     });
   });
 }
@@ -19,13 +19,13 @@ exports.addInterest = function({userID, interests}) {
   interests.split(',').forEach(interest => {
     interest = interest.replace(/^[ ]+|[ ]+$/g,''); // remove leading and trailing whitespaces
     promises.push(new Promise((resolve, reject) => {
-      db.query(addInterest, [userID, interest], (err, result) => {
+      db.query(interestQueries.addInterest, [userID, interest], (err, result) => {
         if (err) {
           console.log(err.message);
           return reject(500);
         }
 
-        return resolve(result);
+        return resolve(result[0][0]);
       });
     }));
   });
@@ -33,15 +33,15 @@ exports.addInterest = function({userID, interests}) {
   return promises;
 }
 
-exports.getUserWithInterests = function(userID) {
+exports.deleteInterest = function({ userID }, interestID) {
   return new Promise((resolve, reject) => {
-    db.query(interestQueries.getUserWithInterests, userID, (err, result) => {
+    db.query(interestQueries.deleteInterest, [userID, interestID], (err, result) => {
       if (err) {
         console.log(err.message);
         return reject(500);
       }
 
-      return resolve(result[0]);
+      return resolve(result);
     });
   });
 }

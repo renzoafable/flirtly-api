@@ -9,9 +9,9 @@ const defaultAttr = {
   province: '',
 };
 
-exports.getUsers = function() {
+exports.getUsers = function({userID}) {
   return new Promise((resolve, reject) => {
-    db.query(userQueries.getUsers, (err, results) => {
+    db.query(userQueries.getUsers, userID,(err, results) => {
       if (err) {
         console.log(err.message);
         return reject(500);
@@ -32,4 +32,22 @@ exports.deleteUser = function({userID}) {
       return resolve();
     });
   });
+}
+
+exports.getUsersWithInterests = function(users) {
+  const promises = [];
+  users.forEach(user => {
+    promises.push(new Promise((resolve, reject) => {
+      db.query(userQueries.getUserWithInterests, user.userID, (err, result) => {
+        if (err) {
+          console.log(err.message);
+          return reject(500);
+        }
+
+        return resolve(result);
+      });
+    }));
+  });
+
+  return promises;
 }

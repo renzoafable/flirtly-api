@@ -4,19 +4,26 @@ const router = express.Router();
 const Ctrl = require('./controller');
 const getUserByUserID = require('../authentication/controller').getUserByUserID;
 const requestConnection = Ctrl.requestConnection;
-const checkRequest = Ctrl.checkRequest;
+const getAllConnections = Ctrl.getAllConnections;
 const getSentConnections = Ctrl.getSentConnections;
 const getReceivedConnections = Ctrl.getReceivedConnections;
-const getConnections = Ctrl.getConnections;
+const getConnectionsOfUser = Ctrl.getConnectionsOfUser;
+const getConnectionOfUser = Ctrl.getConnectionOfUser;
 const approveReceivedConnections = Ctrl.approveReceivedConnections;
+const getPendingRequest = Ctrl.getPendingRequest;
+const deleteRequest = Ctrl.deleteRequest;
 
 const isSameUser = require('../middlewares/middleware').isSameUser;
 
 router.get('/', (req, res, next) => {
   const { user } = req.session;
 
-  getConnections(user)
+  getConnectionsOfUser(user)
     .then(result => {
+      result.map(user => {
+        user.chatColor = Math.floor(Math.random()*16777215).toString(16);
+      })
+
       res.status(200).json({
         status: 200,
         message: 'Successfully fetched user connections',
@@ -39,60 +46,29 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/send/:userID', isSameUser, (req, res, next) => {
-  const { userID: senderID, username: senderName } = req.session.user;
-  let { userID: receiverID } = req.params;
-  receiverID = parseInt(receiverID);
-
-  let user;
+  const { userID } = req.session.user;
+  let connectionID  = parseInt(req.params.userID);
   
-  getUserByUserID(receiverID)
+  let user;
+  getUserByUserID(connectionID)
     .then(user => {
-      user = user;
-      const { username: receiverName } = user;
-      delete user.password;
-
-      checkRequest(senderID, receiverID)
-        .then(result => {
-          if (result) {
-            return res.status(403).json({
-              status: 403,
-              message: 'Connection request already sent'
-            });
-          }
-
-          requestConnection(senderID, senderName, receiverID, receiverName, 0)
-            .then(() => {
-              res.status(200).json({
-                status: 200,
-                message: 'Connection request sent',
-                receiver: user
-              });
-            })
-            .catch(err => {
-              let message = '';
-
-              switch(err) {
-                case 500:
-                  message = 'Internal server error in sending connection request';
-                  break;
-              }
-
-              res.status(err).json({ status: err, message });
-            });
-        })
-        .catch(err => {
-          let message = '';
-
-          switch(err) {
-            case 500:
-              message = 'Internal server error while sending request';
-              break;
-            default:
-              break;
-          }
-
-          res.status(err).json({ status: err, message });
-        })
+      if (user) {
+        user = user;
+        return getAllConnections(userID, connectionID);
+      }
+    })
+    .then(result => {
+      if (result.length) {
+        return Promise.reject(403);
+      }
+      else return requestConnection(userID, connectionID);
+    })
+    .then(result => {
+      res.status(200).json({
+        status: 200,
+        message: 'Successfully sent connection request',
+        users: result
+      });
     })
     .catch(err => {
       let message = '';
@@ -104,6 +80,9 @@ router.post('/send/:userID', isSameUser, (req, res, next) => {
         case 404:
           message = 'User not found';
           break;
+        case 403:
+          message = 'Request have been sent or established already';
+          break;
         default:
           break;
       }
@@ -113,33 +92,27 @@ router.post('/send/:userID', isSameUser, (req, res, next) => {
 });
 
 router.put('/approve/:userID', (req, res, next) => {
-  const { userID: receiverID } = req.session.user;
-  let { userID: senderID } = req.params;
-  senderID = parseInt(senderID);
+  const { user } = req.session;
+  let { userID } = req.params;
+  userID = parseInt(userID);
 
-  let receivedConnection;
-  checkRequest(senderID, receiverID)
+  getPendingRequest(user.userID, userID)
     .then(result => {
       if (result) {
         receivedConnection = result;
-        return approveReceivedConnections(senderID, receiverID);
+        return approveReceivedConnections(user, userID);
       }
       
-      res.status(404).json({
-        status: 404,
-        message: 'Connection request not found'
-      });
+      return Promise.reject(404);
     })
     .then(() => {
-      const { senderID, senderName, receiverID, receiverName} = receivedConnection;
-
-      return requestConnection(receiverID, receiverName, senderID, senderName, 1);
+      return getReceivedConnections(user);
     })
-    .then(() => {
+    .then(result => {
       res.status(200).json({
         status: 200,
         message: 'Successfully approved connection request',
-        request: receivedConnection
+        data: result
       });
     })
     .catch(err => {
@@ -148,6 +121,9 @@ router.put('/approve/:userID', (req, res, next) => {
       switch(err) {
         case 500:
           message = 'Internal server error while approving connection request';
+          break;
+        case 404:
+          message = 'Connection request not found';
           break;
         default:
           break;
@@ -182,6 +158,42 @@ router.get('/sent', (req, res, next) => {
     })
 });
 
+router.delete('/sent/delete/:connectionID', (req, res, next) => {
+  const { user } = req.session;
+  const { connectionID } = req.params;
+
+  getConnectionOfUser(user, connectionID)
+    .then(result => {
+      const { userID, connectionID } = result;
+
+      return deleteRequest(userID, connectionID);
+    })
+    .then(() => {
+      return getSentConnections(user);
+    })
+    .then(result => {
+      res.status(200).json({
+        status: 200,
+        message: 'Successfully canceled request',
+        data: result || null
+      });
+    })
+    .catch(err => {
+      let message = '';
+
+      switch (err) {
+        case 500:
+          message = 'Internal server error while deleting request';
+          break;
+        case 404:
+          message = 'Connection does not exist';
+          break;
+      }
+
+      res.status(err).json({ status: err, message });
+    });
+});
+
 router.get('/received', (req, res, next) => {
   const { user } = req.session;
   getReceivedConnections(user)
@@ -198,6 +210,41 @@ router.get('/received', (req, res, next) => {
       switch (err) {
         case 500:
           message = 'Internal server error while fetching received connection requests';
+          break;
+        default:
+          break;
+      }
+
+      res.status(err).json({ status: err, message });
+    });
+});
+
+router.delete('/received/delete/:userID', (req, res, next) => {
+  const { user } = req.session;
+  const { userID } = req.params;
+
+  getConnectionOfUser({userID}, user.userID)
+    .then(result => {
+      const { userID, connectionID } = result;
+
+      return deleteRequest(userID, connectionID);
+    })
+    .then(() => {
+      return getReceivedConnections(user);
+    })
+    .then(result => {
+      res.status(200).json({
+        status: 200,
+        message: 'Successfully deleted pending request',
+        data: result
+      })
+    })
+    .catch(err => {
+      let message = '';
+
+      switch (err) {
+        case 500: 
+          message = 'Iternal server error while deleting request';
           break;
         default:
           break;

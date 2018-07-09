@@ -1,41 +1,40 @@
 const queries = {
   requestConnection: `
-    INSERT INTO connections (
-      senderID,
-      senderName,
-      receiverID,
-      receiverName,
-      confirmed,
-      dateAdded
-    )
-    VALUES (
-      ?,
-      ?,
-      ?,
-      ?,
-      ?,
-      NOW()
-    )
+    CALL requestConnection(?,?)
   `,
-  getConnections: `
-    SELECT * FROM connections WHERE senderID=? AND confirmed=1
+  getPendingRequest: `
+    SELECT * FROM connections WHERE connectionID=? AND userID=? AND confirmed=0
   `,
-  getPendingConnectionOfUsers: `
-    SELECT * FROM connections WHERE senderID=? AND receiverID=? AND confirmed=0
+  getConnectionsOfUser: `
+    SELECT c.connectionID, u.firstName, u.lastName, c.dateAdded
+    FROM connections c LEFT JOIN users u
+    ON c.connectionID = u.userID
+    WHERE c.userID = ? AND c.confirmed = 1 
+  `,
+  getConnectionOfUser: `
+    SELECT * FROM connections WHERE userID=? AND connectionID=? AND confirmed=0
+  `,
+  getApprovedConnection: `
+    SELECT * FROM connections WHERE userID=? AND connectionID=? AND confirmed=1
+  `,
+  getAllConnections: `
+    CALL getAllConnections(?,?)
   `,
   getSentConnections: `
-    SELECT * FROM connections WHERE senderID=?
+    SELECT c.connectionID, u.firstName, u.lastName, c.confirmed, c.dateAdded 
+    FROM connections c LEFT JOIN users u
+    ON c.connectionID = u.userID
+    WHERE c.userID=? AND c.confirmed = 0
   `,
   getReceivedConnections: `
-    SELECT * FROM connections WHERE receiverID=?
+    SELECT userID, userName, confirmed, dateAdded FROM connections WHERE connectionID=? and confirmed = 0
   `,
   approveReceivedConnections: `
-    UPDATE connections
-    SET 
-      confirmed=TRUE
-    WHERE
-      senderID=? AND receiverID=?
+    CALL approveReceivedConnection(?,?)
   `,
+  deleteConnection: `
+    DELETE FROM connections WHERE userID = ? AND connectionID = ?
+  `
 };
 
 module.exports = queries;

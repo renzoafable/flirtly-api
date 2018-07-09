@@ -1,22 +1,21 @@
 const db = require('../../database/index');
 const connectionQueries = require('./queries');
 
-exports.requestConnection = function(senderID, senderName, receiverID, receiverName, confirmed) {
+exports.requestConnection = function(userID, connectionID) {
   return new Promise((resolve, reject) => {
-    db.query(connectionQueries.requestConnection, [senderID, senderName, receiverID, receiverName, confirmed], (err, result) => {
+    db.query(connectionQueries.requestConnection, [userID, connectionID], (err, result) => {
       if (err) {
         console.log(err.message);
         return reject(500);
       }
-
-      return resolve();
+      return resolve(result[0]);
     });
   });
 }
 
-exports.checkRequest = function(senderID, receiverID) {
+exports.getAllConnections = function(userID, connectionID) {
   return new Promise((resolve, reject) => {
-    db.query(connectionQueries.getPendingConnectionOfUsers, [senderID, receiverID],
+    db.query(connectionQueries.getAllConnections, [userID, connectionID],
       (err, result) => {
         if (err) {
           console.log(err.message);
@@ -53,9 +52,9 @@ exports.getReceivedConnections = function({userID}) {
   });
 }
 
-exports.getConnections = function({userID}) {
+exports.getConnectionsOfUser = function({userID}) {
   return new Promise((resolve, reject) => {
-    db.query(connectionQueries.getConnections, userID, (err, results) => {
+    db.query(connectionQueries.getConnectionsOfUser, [userID, userID], (err, results) => {
       if (err) {
         console.log(err.message);
         return reject(500);
@@ -66,9 +65,39 @@ exports.getConnections = function({userID}) {
   });
 }
 
-exports.approveReceivedConnections = function(senderID, receiverID) {
+exports.getConnectionOfUser = function({userID: senderID}, receiverID) {
   return new Promise((resolve, reject) => {
-    db.query(connectionQueries.approveReceivedConnections, [senderID, receiverID], (err, results) => {
+    db.query(connectionQueries.getConnectionOfUser, [senderID, receiverID], (err, result) => {
+      if (err) {
+        console.log(err.message);
+        return reject(500);
+      }
+    
+      else if(!result.length) return reject(404);
+
+      return resolve(result[0]);
+    });
+  });
+}
+
+exports.getApprovedConnectionOfUser = function({userID: senderID}, receiverID) {
+  return new Promise((resolve, reject) => {
+    db.query(connectionQueries.getApprovedConnection, [senderID, receiverID], (err, result) => {
+      if (err) {
+        console.log(err.message);
+        return reject(500);
+      }
+    
+      else if(!result.length) return reject(404);
+
+      return resolve(result[0]);
+    });
+  });
+}
+
+exports.approveReceivedConnections = function({userID: receiverID}, senderID) {
+  return new Promise((resolve, reject) => {
+    db.query(connectionQueries.approveReceivedConnections, [receiverID, senderID], (err, results) => {
       if (err) {
         console.log(err.message);
         return reject(500);
@@ -76,5 +105,31 @@ exports.approveReceivedConnections = function(senderID, receiverID) {
 
       return resolve(results);
     });
+  });
+}
+
+exports.getPendingRequest = function(connectionID, userID) {
+  return new Promise((resolve, reject) => {
+    db.query(connectionQueries.getPendingRequest, [connectionID, userID], (err, results) => {
+      if (err) {
+        console.log(err.message);
+        return reject(500);
+      }
+
+      return resolve(results[0]);
+    });
+  });
+}
+
+exports.deleteRequest = function(userID, connectionID) {
+  return new Promise((resolve, reject) => {
+    db.query(connectionQueries.deleteConnection, [userID, connectionID], (err, result) => {
+      if (err) {
+        console.log(err.message);
+        return reject(500);
+      }
+
+      return resolve(result);
+    })
   });
 }
