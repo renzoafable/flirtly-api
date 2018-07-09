@@ -1,5 +1,3 @@
-const db = require('../../database/index');
-
 exports.isLoggedIn = function(req, res, next) {
   if (req.session.user) {
     return next();
