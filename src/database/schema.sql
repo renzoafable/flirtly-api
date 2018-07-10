@@ -11,7 +11,7 @@ GRANT SUPER ON *.* TO 'flirtly'@'localhost';
 GRANT ALL PRIVILEGES ON flirtly.* TO 'flirtly'@'localhost';
 
 -- Tables
-/* 
+/*
   users table contains all users registered in the app
 */
 
@@ -54,7 +54,7 @@ CREATE TABLE interests (
     PRIMARY KEY (interestID)
 );
 
-/* 
+/*
   connections table contains all user selected connections
   these are the users that the selected user wanted to match with
 */
@@ -162,7 +162,7 @@ CREATE PROCEDURE requestConnection (
   connectionID INT
 )
 BEGIN
-  INSERT INTO connections 
+  INSERT INTO connections
   VALUES (
     userID,
     (select username from users where users.userID = userID),
@@ -183,7 +183,7 @@ CREATE PROCEDURE getAllConnections (
   connectionID INT
 )
 BEGIN
-  SELECT * FROM connections WHERE (connections.userID=userID or connections.connectionID=userID) 
+  SELECT * FROM connections WHERE (connections.userID=userID or connections.connectionID=userID)
   AND (connections.userID=connectionID or connections.connectionID=connectionID);
 END;
 $$
@@ -196,7 +196,7 @@ CREATE PROCEDURE getPendingConnections (
   connectionID INT
 )
 BEGIN
-  SELECT * FROM connections WHERE (connections.userID=userID or connections.connectionID=userID) 
+  SELECT * FROM connections WHERE (connections.userID=userID or connections.connectionID=userID)
   AND (connections.userID=connectionID or connections.connectionID=connectionID) AND confirmed=0;
 END;
 $$
@@ -210,7 +210,7 @@ CREATE PROCEDURE approveReceivedConnection (
 )
 BEGIN
   UPDATE connections
-  SET confirmed=TRUE 
+  SET confirmed=TRUE
   WHERE connections.userID=userID AND connections.connectionID=connectionID;
   INSERT INTO connections
   VALUES  (
@@ -249,14 +249,11 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS getUsers;
 DELIMITER $$
 CREATE PROCEDURE getUsers (
-  userID INT
+  ID INT
 )
 BEGIN
-  SELECT DISTINCT u.*, c.confirmed 
-  FROM users u 
-  LEFT JOIN connections c 
-  ON u.userID = c.connectionID
-  WHERE u.userID != userID;
+  SELECT * FROM users
+  WHERE userID != ID;
 END;
 $$
 DELIMITER ;
@@ -269,7 +266,7 @@ CREATE PROCEDURE getChats (
 )
 BEGIN
   SELECT * FROM messages
-  WHERE messages.senderID IN (userID, connectionID) 
+  WHERE messages.senderID IN (userID, connectionID)
   AND messages.receiverID IN (userID, connectionID)
   ORDER BY messages.timeSent;
 END;
