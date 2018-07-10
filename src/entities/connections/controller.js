@@ -3,6 +3,7 @@ const authRepo = require('../authentication/repo')(db);
 
 const connectionsCtrl = function (repo) {
   const controller = {
+    // get / controller
     getConnectionsOfUser: (req, res) => {
       const { user } = req.session;
 
@@ -32,7 +33,7 @@ const connectionsCtrl = function (repo) {
           res.status(err).json({ status: err, message });
         });
     },
-
+    // post /send/:connectionID controller
     requestConnection: (req, res) => {
       const { userID } = req.session.user;
       let connectionID = parseInt(req.params.userID);
@@ -78,7 +79,7 @@ const connectionsCtrl = function (repo) {
           res.status(err).json({ status: err, message });
         });
     },
-
+    // put /approve/:userID controller
     approveReceivedConnections: (req, res) => {
       const { user } = req.session;
       let { userID } = req.params;
@@ -120,7 +121,7 @@ const connectionsCtrl = function (repo) {
           res.status(err).json({ status: err, message });
         });
     },
-
+    // get /sent controller
     getSentConnections: (req, res) => {
       const { user } = req.session;
       repo.getSentConnections(user)
@@ -145,7 +146,7 @@ const connectionsCtrl = function (repo) {
           res.status(err).json({ status: err, message });
         });
     },
-
+    // get /received controller
     getReceivedConnections: (req, res) => {
       const { user } = req.session;
       repo.getReceivedConnections(user)
@@ -170,7 +171,7 @@ const connectionsCtrl = function (repo) {
           res.status(err).json({ status: err, message });
         });
     },
-
+    // delete /sent/delete/:connectionID controller
     deleteSentRequest: (req, res) => {
       const { user } = req.session;
       const { connectionID } = req.params;
@@ -206,7 +207,7 @@ const connectionsCtrl = function (repo) {
           res.status(err).json({ status: err, message });
         });
     },
-
+    // delete /received/delete/:connectionID controller
     deleteReceivedRequest: (req, res) => {
       const { user } = req.session;
       const { userID } = req.params;

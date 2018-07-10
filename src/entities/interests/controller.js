@@ -1,5 +1,6 @@
 const interestCtrl = function (repo) {
   const controller = {
+    // get / controller
     getInterests: (req, res) => {
       let { user } = req.session;
 
@@ -25,7 +26,7 @@ const interestCtrl = function (repo) {
           res.status(err).json({ status: err, message });
         });
     },
-
+    // post /add controller
     addInterest: (req, res) => {
       const { user } = req.session;
       const { interests } = req.body;
@@ -54,7 +55,7 @@ const interestCtrl = function (repo) {
           res.status(err).json({ status: err, message });
         })
     },
-
+    // delete /delete/:interestID controller
     deleteInterest: (req, res) => {
       const { user } = req.session;
       const { interestID } = req.params;
