@@ -1,6 +1,6 @@
 const queries = require('./queries');
 
-const userRepo = function (db, queries) {
+const userRepo = function (db) {
   const repo = {
     getUsers: ({ userID }) => {
       return new Promise((resolve, reject) => {
