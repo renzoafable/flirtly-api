@@ -2,9 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const db = require('../../database/index');
-const queries = require('./queries');
 
-const userRepo = require('./repo')(db, queries);
+const userRepo = require('./repo')(db);
 const userCtrl = require('./controller')(userRepo);
 
 const connectionRouter = require('../connections/router');

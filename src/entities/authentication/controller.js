@@ -35,6 +35,8 @@ const authCtrl = function (repo) {
               case 400:
                 message = 'Invalid credentials';
                 break;
+              case 404:
+                message = 'User not found';
               default:
                 break;
             }

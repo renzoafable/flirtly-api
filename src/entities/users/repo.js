@@ -1,3 +1,5 @@
+const queries = require('./queries');
+
 const userRepo = function (db, queries) {
   const repo = {
     getUsers: ({ userID }) => {

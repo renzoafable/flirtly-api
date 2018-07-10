@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
+const db = require('../../database/index');
+
 const Ctrl = require('./controller');
-const getUserByUserID = require('../authentication/controller').getUserByUserID;
+const authRepo = require('../authentication/repo')(db);
 const requestConnection = Ctrl.requestConnection;
 const getAllConnections = Ctrl.getAllConnections;
 const getSentConnections = Ctrl.getSentConnections;
@@ -50,7 +52,7 @@ router.post('/send/:userID', isSameUser, (req, res, next) => {
   let connectionID  = parseInt(req.params.userID);
   
   let user;
-  getUserByUserID(connectionID)
+  authRepo.getUserByUserID(connectionID)
     .then(user => {
       if (user) {
         user = user;
@@ -67,7 +69,7 @@ router.post('/send/:userID', isSameUser, (req, res, next) => {
       res.status(200).json({
         status: 200,
         message: 'Successfully sent connection request',
-        users: result
+        data: result
       });
     })
     .catch(err => {

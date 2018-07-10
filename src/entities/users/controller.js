@@ -47,7 +47,7 @@ const userCtrl = function(repo) {
       delete user.password;
 
       repo.deleteUser(user)
-        .then(result => {
+        .then(() => {
           req.session.destroy();
           res.status(200).json({
             status: 200,

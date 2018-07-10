@@ -1,8 +1,9 @@
 const bcrypt = require('bcrypt');
 
+const queries = require('./queries');
 const formatUserBody = require('../../utilities').formatUserBody;
 
-const authRepo = function (db, queries) {
+const authRepo = function (db) {
   const repo = {
     signin: ({ username, password }) => {
       return new Promise((resolve, reject) => {
