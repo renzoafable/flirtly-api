@@ -1,5 +1,5 @@
-// TODO: Update later
-const getApprovedConnectionOfUser = require('../connections/controller').getApprovedConnectionOfUser;
+const db = require('../../database/index');
+const connectionsRepo = require('../connections/repo')(db);
 
 const messagesCtrl = function (repo) {
   const controller = {
@@ -92,7 +92,7 @@ const messagesCtrl = function (repo) {
       const { message } = req.body;
 
 
-      getApprovedConnectionOfUser(user, receiverID)
+      connectionsRepo.getApprovedConnectionOfUser(user, receiverID)
         .then(() => {
           return repo.sendMessage(senderID, receiverID, message);
         })

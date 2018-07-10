@@ -128,7 +128,7 @@ const connectionsCtrl = function (repo) {
           res.status(200).json({
             status: 200,
             message: 'Successfully fetched sent connection requests',
-            sentRequests: result || null
+            data: result
           });
         })
         .catch(err => {
@@ -153,7 +153,7 @@ const connectionsCtrl = function (repo) {
           res.status(200).json({
             status: 200,
             message: 'Successfully fetched received connection requests',
-            receivedConnections: result || null
+            data: result || null
           });
         })
         .catch(err => {
