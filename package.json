@@ -4,7 +4,7 @@
   "description": "A mini dating app",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jasmine",
     "seed": "mysql -u root -p < ./src/database/schema.sql",
     "start": "nodemon ./src/index.js"
   },
@@ -21,6 +21,7 @@
     "mysql": "^2.15.0"
   },
   "devDependencies": {
+    "jasmine": "^3.1.0",
     "nodemon": "^1.17.5"
   }
 }

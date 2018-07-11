@@ -3,7 +3,8 @@ const authCtrl = function (repo, bcrypt) {
     // post /signin controller
     signin: (req, res) => {
       if (req.session.user) {
-        res.status(403).json({
+        res.status(403);
+        res.json({
           status: 403,
           message: 'Already logged in',
           data: req.session.user
@@ -17,7 +18,8 @@ const authCtrl = function (repo, bcrypt) {
             delete user.password;
             req.session.user = user;
 
-            res.status(200).json({
+            res.status(200);
+            res.json({
               status: 200,
               message: 'Successfully signed in',
               data: user
@@ -39,7 +41,8 @@ const authCtrl = function (repo, bcrypt) {
                 break;
             }
 
-            res.status(err).json({ status: err, message });
+            res.status(err);
+            res.json({ status: err, message });
           });
       }
     },
@@ -108,7 +111,8 @@ const authCtrl = function (repo, bcrypt) {
 
     //  post /session controller
     getSession: (req, res) => {
-      res.status(200).json({
+      res.status(200);
+      res.json({
         status: 200,
         message: 'Successfully fetched session',
         data: req.session.user ? req.session.user : null
