@@ -1,7 +1,4 @@
-const db = require('../../database/index');
-const connectionsRepo = require('../connections/repo')(db);
-
-const messagesCtrl = function (repo) {
+const messagesCtrl = function (repo, connectionsRepo) {
   const controller = {
     // get /message controller
     getMessages: (req, res) => {

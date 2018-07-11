@@ -1,7 +1,7 @@
 const db = require('../../database/index');
-const connectionsRepo = require('../connections/repo')(db);
 
-const userCtrl = function(repo) {
+
+const userCtrl = function(repo, connectionsRepo) {
   const controller = {
     // get /user controller
     getUsers: (req, res) => {

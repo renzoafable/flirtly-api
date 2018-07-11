@@ -1,6 +1,4 @@
-const bcrypt = require('bcrypt');
-
-const authCtrl = function (repo) {
+const authCtrl = function (repo, bcrypt) {
   const controller = {
     // post /signin controller
     signin: (req, res) => {

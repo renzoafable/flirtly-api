@@ -6,8 +6,9 @@ const isSameUser = require('../middlewares/middleware').isSameUser;
 
 const db = require('../../database/index');
 
+const connectionsRepo = require('../connections/repo')(db);
 const messagesRepo = require('./repo')(db);
-const messagesCtrl = require('./controller')(messagesRepo);
+const messagesCtrl = require('./controller')(messagesRepo, connectionsRepo);
 
 router.get('/', messagesCtrl.getMessages);
 router.get('/sent', messagesCtrl.getSentMessages);

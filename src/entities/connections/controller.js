@@ -1,7 +1,4 @@
-const db = require('../../database/index')
-const authRepo = require('../authentication/repo')(db);
-
-const connectionsCtrl = function (repo) {
+const connectionsCtrl = function (repo, authRepo) {
   const controller = {
     // get / controller
     getConnectionsOfUser: (req, res) => {

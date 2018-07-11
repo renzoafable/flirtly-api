@@ -3,8 +3,9 @@ const router = express.Router();
 
 const db = require('../../database/index');
 
+const authRepo = require('../authentication/repo')(db)
 const connectionsRepo = require('./repo')(db);
-const connectionsCtrl = require('./controller')(connectionsRepo);
+const connectionsCtrl = require('./controller')(connectionsRepo, authRepo);
 
 const isSameUser = require('../middlewares/middleware').isSameUser;
 

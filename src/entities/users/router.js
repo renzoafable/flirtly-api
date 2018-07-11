@@ -3,8 +3,9 @@ const router = express.Router();
 
 const db = require('../../database/index');
 
+const connectionsRepo = require('../connections/repo')(db);
 const userRepo = require('./repo')(db);
-const userCtrl = require('./controller')(userRepo);
+const userCtrl = require('./controller')(userRepo, connectionsRepo);
 
 const connectionRouter = require('../connections/router');
 const messageRouter = require('../messages/router');
