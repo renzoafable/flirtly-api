@@ -299,6 +299,8 @@ describe("authCtrl", () => {
         return Promise.resolve(mockReq.body);
       });
 
+      controller = authCtrl(mockRepo, mockBcrypt);
+
       mockRes.json.and.callFake(response => {
         expect(mockBcrypt.hash).toHaveBeenCalledWith(
           "Hello",
@@ -314,6 +316,138 @@ describe("authCtrl", () => {
           data: {
             username: mockReq.body.username
           }
+        });
+        done();
+      });
+
+      controller.signup(mockReq, mockRes);
+    });
+
+    it("should return status 500 if repo.signup fails", done => {
+      const mockRepo = jasmine.createSpyObj("mockRepo", ["signup"]);
+      const mockBcrypt = jasmine.createSpyObj("mockBcrypt", ["hash"]);
+
+      const mockReq = {
+        body: {
+          username: "Renzo",
+          password: "Hello"
+        }
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
+
+      mockBcrypt.hash.and.callFake((password, hashRound, callBack) => {
+        return callBack(null, "hashedPassword");
+      });
+
+      mockRepo.signup.and.callFake(() => {
+        return Promise.reject(500);
+      });
+
+      mockRes.json.and.callFake(response => {
+        expect(mockBcrypt.hash).toHaveBeenCalledWith(
+          "Hello",
+          10,
+          jasmine.any(Function)
+        );
+        expect(mockRepo.signup).toHaveBeenCalledWith(mockReq.body);
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(response).toEqual({
+          status: 500,
+          message: "Internal server error while creating user"
+        });
+        done();
+      });
+
+      controller = authCtrl(mockRepo, mockBcrypt);
+      controller.signup(mockReq, mockRes);
+    });
+
+    it("should return status 500 if repo.getUserByUserID fails", done => {
+      const mockRepo = jasmine.createSpyObj("mockRepo", [
+        "signup",
+        "getUserByUserID"
+      ]);
+      const mockBcrypt = jasmine.createSpyObj("mockBcrypt", ["hash"]);
+
+      const mockReq = {
+        body: {
+          username: "Renzo",
+          password: "Hello"
+        }
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
+
+      mockBcrypt.hash.and.callFake((password, hashRound, callBack) => {
+        return callBack(null, "hashedPassword");
+      });
+
+      mockRepo.signup.and.callFake(() => {
+        return Promise.resolve(1);
+      });
+
+      mockRepo.getUserByUserID.and.callFake(() => {
+        return Promise.reject(500);
+      });
+
+      mockRes.json.and.callFake(response => {
+        expect(mockBcrypt.hash).toHaveBeenCalledWith(
+          "Hello",
+          10,
+          jasmine.any(Function)
+        );
+        expect(mockRepo.signup).toHaveBeenCalledWith(mockReq.body);
+        expect(mockRepo.getUserByUserID).toHaveBeenCalledWith(1);
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(response).toEqual({
+          status: 500,
+          message: "Internal server error while creating user"
+        });
+        done();
+      });
+
+      controller = authCtrl(mockRepo, mockBcrypt);
+      controller.signup(mockReq, mockRes);
+    });
+
+    it("should return status 404 if repo.getUserByUserID did not find created user", done => {
+      const mockRepo = jasmine.createSpyObj("mockRepo", [
+        "signup",
+        "getUserByUserID"
+      ]);
+      const mockBcrypt = jasmine.createSpyObj("mockBcrypt", ["hash"]);
+
+      const mockReq = {
+        body: {
+          username: "Renzo",
+          password: "Hello"
+        }
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
+
+      mockBcrypt.hash.and.callFake((password, hashRound, callBack) => {
+        return callBack(null, "hashedPassword");
+      });
+
+      mockRepo.signup.and.callFake(() => {
+        return Promise.resolve(1);
+      });
+
+      mockRepo.getUserByUserID.and.callFake(() => {
+        return Promise.reject(404);
+      });
+
+      mockRes.json.and.callFake(response => {
+        expect(mockBcrypt.hash).toHaveBeenCalledWith(
+          "Hello",
+          10,
+          jasmine.any(Function)
+        );
+        expect(mockRepo.signup).toHaveBeenCalledWith(mockReq.body);
+        expect(mockRepo.getUserByUserID).toHaveBeenCalledWith(1);
+        expect(mockRes.status).toHaveBeenCalledWith(404);
+        expect(response).toEqual({
+          status: 404,
+          message: "User not found"
         });
         done();
       });
