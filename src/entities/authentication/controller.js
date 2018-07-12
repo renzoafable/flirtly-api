@@ -57,6 +57,7 @@ const authCtrl = function(repo, bcrypt) {
         repo
           .signup(req.body)
           .then(value => {
+            console.log("ere");
             const userID = value;
 
             return repo.getUserByUserID(userID);
