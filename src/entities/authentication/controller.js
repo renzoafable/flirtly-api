@@ -1,4 +1,4 @@
-const authCtrl = function (repo, bcrypt) {
+const authCtrl = function(repo, bcrypt) {
   const controller = {
     // post /signin controller
     signin: (req, res) => {
@@ -6,12 +6,12 @@ const authCtrl = function (repo, bcrypt) {
         res.status(403);
         res.json({
           status: 403,
-          message: 'Already logged in',
+          message: "Already logged in",
           data: req.session.user
         });
-      }
-      else {
-        repo.signin(req.body)
+      } else {
+        repo
+          .signin(req.body)
           .then(result => {
             const user = result;
 
@@ -21,22 +21,22 @@ const authCtrl = function (repo, bcrypt) {
             res.status(200);
             res.json({
               status: 200,
-              message: 'Successfully signed in',
+              message: "Successfully signed in",
               data: user
             });
           })
           .catch(err => {
-            let message = '';
+            let message = "";
 
             switch (err) {
               case 500:
-                message = 'Internal server error on sign in';
+                message = "Internal server error on sign in";
                 break;
               case 400:
-                message = 'Invalid credentials';
+                message = "Invalid credentials";
                 break;
               case 404:
-                message = 'User not found';
+                message = "User not found";
               default:
                 break;
             }
@@ -54,32 +54,35 @@ const authCtrl = function (repo, bcrypt) {
       bcrypt.hash(req.body.password, 10, (err, result) => {
         req.body.password = result;
 
-        repo.signup(req.body)
+        repo
+          .signup(req.body)
           .then(value => {
+            console.log("ere");
             const userID = value;
 
             return repo.getUserByUserID(userID);
           })
           .then(result => {
-            user = result
+            user = result;
 
             delete user.password;
 
-            res.status(200).json({
+            res.status(200);
+            res.json({
               status: 200,
-              message: 'Successfully created user',
+              message: "Successfully created user",
               data: user
             });
           })
           .catch(err => {
-            let message = '';
+            let message = "";
 
             switch (err) {
               case 500:
-                message = 'Internal server error while creating user';
+                message = "Internal server error while creating user";
                 break;
               case 404:
-                message = 'User not found';
+                message = "User not found";
                 break;
               default:
                 break;
@@ -96,17 +99,15 @@ const authCtrl = function (repo, bcrypt) {
         res.status(400);
         res.json({
           status: 400,
-          message: 'No user is signed in'
+          message: "No user is signed in"
         });
-      }
-
-      else  {
+      } else {
         req.session.destroy();
 
         res.status(200);
         res.json({
           status: 200,
-          message: 'Successfully signed out user'
+          message: "Successfully signed out user"
         });
       }
     },
@@ -116,13 +117,13 @@ const authCtrl = function (repo, bcrypt) {
       res.status(200);
       res.json({
         status: 200,
-        message: 'Successfully fetched session',
+        message: "Successfully fetched session",
         data: req.session.user ? req.session.user : null
-      })
+      });
     }
-  }
+  };
 
   return controller;
-}
+};
 
 module.exports = authCtrl;

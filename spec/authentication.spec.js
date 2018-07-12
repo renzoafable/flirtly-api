@@ -270,4 +270,48 @@ describe("authCtrl", () => {
       controller.signout(mockReq, mockRes);
     });
   });
+
+  describe("signup", () => {
+    it("should return status 200 if user is successfully created", done => {
+      const mockRepo = jasmine.createSpyObj("mockRepo", [
+        "signup",
+        "getUserByUserID"
+      ]);
+      const mockBcrypt = jasmine.createSpyObj("mockBcrypt", ["hash"]);
+
+      const mockReq = {
+        body: {
+          username: "Renzo",
+          password: "Hello"
+        }
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
+
+      mockBcrypt.hash.and.callFake((password, hashRound, callBack) => {
+        return callBack(null, "hashedPassword");
+      });
+
+      mockRepo.signup.and.callFake(() => {
+        return Promise.resolve(1);
+      });
+
+      mockRepo.getUserByUserID.and.callFake(() => {
+        return Promise.resolve(mockReq.body);
+      });
+
+      mockRes.json.and.callFake(response => {
+        expect(mockBcrypt.hash).toHaveBeenCalledWith(
+          "Hello",
+          10,
+          jasmine.any(Function)
+        );
+        expect(mockRepo.signup).toHaveBeenCalledWith(mockReq.body);
+        expect(mockRepo.getUserByUserID).toHaveBeenCalledWith(1);
+        done();
+      });
+
+      controller = authCtrl(mockRepo, mockBcrypt);
+      controller.signup(mockReq, mockRes);
+    });
+  });
 });
