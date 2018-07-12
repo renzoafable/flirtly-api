@@ -1,17 +1,16 @@
-const authCtrl = require('../src/entities/authentication/controller');
+const authCtrl = require("../src/entities/authentication/controller");
 
-describe('authCtrl', () => {
+describe("authCtrl", () => {
   let controller;
 
-  describe('signin', () => {
-    it('should return error 500 with correct message if internal server error', (done) => {
+  describe("signin", () => {
+    it("should return error 500 with correct message if internal server error", done => {
       // arrange
-      const mockRepo = jasmine.createSpyObj('mockRepo', ['signin']);
+      const mockRepo = jasmine.createSpyObj("mockRepo", ["signin"]);
       const mockBcrypt = null;
 
       const mockReq = {
-        session: {
-        },
+        session: {},
         body: {
           user: {
             userId: 1
@@ -19,7 +18,7 @@ describe('authCtrl', () => {
         }
       };
 
-      const mockRes = jasmine.createSpyObj('mockRes', ['status', 'json']);
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
 
       mockRepo.signin.and.callFake(() => {
         return Promise.reject(500);
@@ -27,13 +26,13 @@ describe('authCtrl', () => {
 
       controller = authCtrl(mockRepo, mockBcrypt);
 
-      mockRes.json.and.callFake((param) => {
+      mockRes.json.and.callFake(param => {
         // assert
         expect(mockRepo.signin).toHaveBeenCalledWith(mockReq.body);
         expect(mockRes.status).toHaveBeenCalledWith(500);
         expect(param).toEqual({
           status: 500,
-          message: 'Internal server error on sign in'
+          message: "Internal server error on sign in"
         });
         done();
       });
@@ -42,14 +41,13 @@ describe('authCtrl', () => {
       controller.signin(mockReq, mockRes);
     });
 
-    it('should return status 200 with correct message if successful', (done) => {
+    it("should return status 200 with correct message if successful", done => {
       // arrange
-      const mockRepo = jasmine.createSpyObj('mockRepo', ['signin']);
+      const mockRepo = jasmine.createSpyObj("mockRepo", ["signin"]);
       const mockBcrypt = null;
 
       const mockReq = {
-        session: {
-        },
+        session: {},
         body: {
           user: {
             userId: 1
@@ -57,13 +55,13 @@ describe('authCtrl', () => {
         }
       };
 
-      const mockRes = jasmine.createSpyObj('mockRes', ['status', 'json']);
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
 
       const mockUser = {
         userId: 1,
-        username: 'mark',
-        password: 'hello'
-      }
+        username: "mark",
+        password: "hello"
+      };
 
       mockRepo.signin.and.callFake(() => {
         return Promise.resolve(mockUser);
@@ -71,18 +69,18 @@ describe('authCtrl', () => {
 
       controller = authCtrl(mockRepo, mockBcrypt);
 
-      mockRes.json.and.callFake((param) => {
+      mockRes.json.and.callFake(param => {
         // assert
         expect(mockReq.session.user).toEqual(mockUser);
         expect(mockRes.status).toHaveBeenCalledWith(200);
         expect(param).toEqual({
           status: 200,
-          message: 'Successfully signed in',
+          message: "Successfully signed in",
           data: {
             userId: mockUser.userId,
             username: mockUser.username
           }
-        })
+        });
         done();
       });
 
@@ -90,9 +88,9 @@ describe('authCtrl', () => {
       controller.signin(mockReq, mockRes);
     });
 
-    it('should return status 400 with correct message if invalid credentials', (done) => {
+    it("should return status 400 with correct message if invalid credentials", done => {
       // arrange
-      const mockRepo = jasmine.createSpyObj('mockRepo', ['signin']);
+      const mockRepo = jasmine.createSpyObj("mockRepo", ["signin"]);
       const mockBcrypt = null;
 
       const mockReq = {
@@ -100,12 +98,12 @@ describe('authCtrl', () => {
         body: {
           user: {
             userId: 1,
-            password: 'adasdad'
+            password: "adasdad"
           }
         }
       };
 
-      const mockRes = jasmine.createSpyObj('mockRes', ['status', 'json']);
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
 
       mockRepo.signin.and.callFake(() => {
         return Promise.reject(400);
@@ -113,13 +111,13 @@ describe('authCtrl', () => {
 
       controller = authCtrl(mockRepo, mockBcrypt);
 
-      mockRes.json.and.callFake((param) => {
+      mockRes.json.and.callFake(param => {
         // assert
         expect(mockRepo.signin).toHaveBeenCalledWith(mockReq.body);
         expect(mockRes.status).toHaveBeenCalledWith(400);
         expect(param).toEqual({
           status: 400,
-          message: 'Invalid credentials'
+          message: "Invalid credentials"
         });
         done();
       });
@@ -128,20 +126,20 @@ describe('authCtrl', () => {
       controller.signin(mockReq, mockRes);
     });
 
-    it('should return status 404 if user does not exist', (done) => {
-      const mockRepo = jasmine.createSpyObj('mockRepo', ['signin']);
+    it("should return status 404 if user does not exist", done => {
+      const mockRepo = jasmine.createSpyObj("mockRepo", ["signin"]);
       const mockBcrypt = null;
 
       const mockReq = {
         session: {},
         body: {
           user: {
-            username: 'lbafable',
-            password: 'adasdsd'
+            username: "lbafable",
+            password: "adasdsd"
           }
         }
-      }
-      const mockRes = jasmine.createSpyObj('mockRes', ['status', 'json']);
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
 
       mockRepo.signin.and.callFake(() => {
         return Promise.reject(404);
@@ -149,12 +147,12 @@ describe('authCtrl', () => {
 
       controller = authCtrl(mockRepo, mockBcrypt);
 
-      mockRes.json.and.callFake((param) => {
+      mockRes.json.and.callFake(param => {
         expect(mockRepo.signin).toHaveBeenCalledWith(mockReq.body);
         expect(mockRes.status).toHaveBeenCalledWith(404);
         expect(param).toEqual({
           status: 404,
-          message: 'User not found'
+          message: "User not found"
         });
         done();
       });
@@ -163,24 +161,24 @@ describe('authCtrl', () => {
     });
   });
 
-  describe('getSession', () => {
-    it('should return status 200 with null user if session does not exists', (done) => {
+  describe("getSession", () => {
+    it("should return status 200 with null user if session does not exists", done => {
       const mockRepo = null;
       const mockBcrypt = null;
 
       const mockReq = {
         session: {}
-      }
+      };
 
-      const mockRes = jasmine.createSpyObj('mockRes', ['status', 'json']);
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
 
       controller = authCtrl(mockRepo, mockBcrypt);
 
-      mockRes.json.and.callFake((param) => {
+      mockRes.json.and.callFake(param => {
         expect(mockRes.status).toHaveBeenCalledWith(200);
         expect(param).toEqual({
           status: 200,
-          message: 'Successfully fetched session',
+          message: "Successfully fetched session",
           data: mockReq.session.user ? mockReq.session.user : null
         });
         done();
@@ -189,26 +187,26 @@ describe('authCtrl', () => {
       controller.getSession(mockReq, mockRes);
     });
 
-    it('should return status 200 with user if session exists', (done) => {
+    it("should return status 200 with user if session exists", done => {
       const mockRepo = null;
       const mockBcrypt = null;
 
       const mockReq = {
         session: {
           user: {
-            username: 'Renzo'
+            username: "Renzo"
           }
         }
-      }
-      const mockRes = jasmine.createSpyObj('mockRes', ['status', 'json']);
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
 
       controller = authCtrl(mockRepo, mockBcrypt);
 
-      mockRes.json.and.callFake((param) => {
+      mockRes.json.and.callFake(param => {
         expect(mockRes.status).toHaveBeenCalledWith(200);
         expect(param).toEqual({
           status: 200,
-          message: 'Successfully fetched session',
+          message: "Successfully fetched session",
           data: mockReq.session.user ? mockReq.session.user : null
         });
         done();
@@ -218,15 +216,15 @@ describe('authCtrl', () => {
     });
   });
 
-  describe('signout', () => {
-    it('should return status 400 if no user is signed in', done => {
+  describe("signout", () => {
+    it("should return status 400 if no user is signed in", done => {
       const mockRepo = null;
       const mockBcrypt = null;
 
       const mockReq = {
         session: {}
-      }
-      const mockRes = jasmine.createSpyObj('mockRes', ['status', 'json']);
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
 
       controller = authCtrl(mockRepo, mockBcrypt);
 
@@ -234,12 +232,42 @@ describe('authCtrl', () => {
         expect(mockRes.status).toHaveBeenCalledWith(400);
         expect(response).toEqual({
           status: 400,
-          message: 'No user is signed in'
+          message: "No user is signed in"
         });
         done();
       });
 
       controller.signout(mockReq, mockRes);
-    })
+    });
+
+    it("should return status 200 if a user is signed in", done => {
+      const mockRepo = null;
+      const mockBcrypt = null;
+
+      const mockReq = {
+        session: {
+          user: {
+            username: "renzo",
+            password: "hello"
+          },
+          destroy: () => {}
+        }
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
+
+      controller = authCtrl(mockRepo, mockBcrypt);
+
+      mockRes.json.and.callFake(response => {
+        expect(mockReq.session.destroy).toBeTruthy(true);
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(response).toEqual({
+          status: 200,
+          message: "Successfully signed out user"
+        });
+        done();
+      });
+
+      controller.signout(mockReq, mockRes);
+    });
   });
 });
