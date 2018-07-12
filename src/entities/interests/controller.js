@@ -19,7 +19,6 @@ const interestCtrl = function(repo) {
 
           switch (err) {
             case 500:
-              a;
               message = "Internal server error while fetching interests";
               break;
             default:

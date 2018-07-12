@@ -39,5 +39,66 @@ describe("interestsCtrl", () => {
       controller = interestsCtrl(mockRepo);
       controller.getInterests(mockReq, mockRes);
     });
+
+    it("should return status 500 if repo.getInterests fails", done => {
+      const mockRepo = jasmine.createSpyObj("mockRepo", ["getInterests"]);
+
+      const mockReq = {
+        session: {
+          user: {
+            username: "Renzo",
+            password: "Hello"
+          }
+        }
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
+
+      mockRepo.getInterests.and.callFake(() => {
+        return Promise.reject(500);
+      });
+
+      mockRes.json.and.callFake(response => {
+        expect(mockRepo.getInterests).toHaveBeenCalledWith(
+          mockReq.session.user
+        );
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(response).toEqual({
+          status: 500,
+          message: "Internal server error while fetching interests"
+        });
+        done();
+      });
+
+      controller = interestsCtrl(mockRepo);
+      controller.getInterests(mockReq, mockRes);
+    });
+
+    it("should return status 500 if user does not exist", done => {
+      const mockRepo = jasmine.createSpyObj("mockRepo", ["getInterests"]);
+
+      const mockReq = {
+        session: {}
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
+
+      mockRepo.getInterests.and.callFake(() => {
+        return Promise.reject(500);
+      });
+
+      mockRes.json.and.callFake(response => {
+        expect(mockRepo.getInterests).toHaveBeenCalledWith(
+          mockReq.session.user
+        );
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(response).toEqual({
+          status: 500,
+          message: "Internal server error while fetching interests"
+        });
+        done();
+      });
+
+      controller = interestsCtrl(mockRepo);
+      controller.getInterests(mockReq, mockRes);
+    });
   });
 });
