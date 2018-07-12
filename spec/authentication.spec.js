@@ -215,6 +215,31 @@ describe('authCtrl', () => {
       });
 
       controller.getSession(mockReq, mockRes);
-    }); 
+    });
+  });
+
+  describe('signout', () => {
+    it('should return status 400 if no user is signed in', done => {
+      const mockRepo = null;
+      const mockBcrypt = null;
+
+      const mockReq = {
+        session: {}
+      }
+      const mockRes = jasmine.createSpyObj('mockRes', ['status', 'json']);
+
+      controller = authCtrl(mockRepo, mockBcrypt);
+
+      mockRes.json.and.callFake(response => {
+        expect(mockRes.status).toHaveBeenCalledWith(400);
+        expect(response).toEqual({
+          status: 400,
+          message: 'No user is signed in'
+        });
+        done();
+      });
+
+      controller.signout(mockReq, mockRes);
+    })
   });
 });

@@ -93,7 +93,8 @@ const authCtrl = function (repo, bcrypt) {
     // post /signout controller
     signout: (req, res) => {
       if (!req.session.user) {
-        res.status(400).json({
+        res.status(400);
+        res.json({
           status: 400,
           message: 'No user is signed in'
         });
@@ -102,7 +103,8 @@ const authCtrl = function (repo, bcrypt) {
       else  {
         req.session.destroy();
 
-        res.status(200).json({
+        res.status(200);
+        res.json({
           status: 200,
           message: 'Successfully signed out user'
         });
