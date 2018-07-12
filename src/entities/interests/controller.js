@@ -36,7 +36,8 @@ const interestCtrl = function(repo) {
       const args = { userID: user.userID, interests };
       Promise.all(repo.addInterest(args))
         .then(result => {
-          res.status(200).json({
+          res.status(200);
+          res.json({
             status: 200,
             message: "Successfully added interest/s",
             data: result
@@ -53,7 +54,8 @@ const interestCtrl = function(repo) {
               break;
           }
 
-          res.status(err).json({ status: err, message });
+          res.status(err);
+          res.json({ status: err, message });
         });
     },
     // delete /delete/:interestID controller

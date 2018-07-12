@@ -101,4 +101,88 @@ describe("interestsCtrl", () => {
       controller.getInterests(mockReq, mockRes);
     });
   });
+
+  describe("addInterest", () => {
+    it("should return status 200 if interest is successfully added", done => {
+      const mockRepo = jasmine.createSpyObj("mockRepo", ["addInterest"]);
+
+      const mockReq = {
+        session: {
+          user: {
+            userID: 1,
+            username: "Renzo",
+            password: "Hello"
+          }
+        },
+        body: {
+          interests: ["badminton", "basketball", "anime"]
+        }
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
+
+      const mockArgs = {
+        userID: mockReq.session.user.userID,
+        interests: mockReq.body.interests
+      };
+
+      mockRepo.addInterest.and.callFake(() => {
+        const body = mockReq.body.interests.map(interest =>
+          Promise.resolve(interest)
+        );
+        return body;
+      });
+
+      mockRes.json.and.callFake(response => {
+        expect(mockRepo.addInterest).toHaveBeenCalledWith(mockArgs);
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(response).toEqual({
+          status: 200,
+          message: "Successfully added interest/s",
+          data: [...mockReq.body.interests]
+        });
+        done();
+      });
+
+      controller = interestsCtrl(mockRepo);
+      controller.addInterest(mockReq, mockRes);
+    });
+
+    it("should return status 500 if repo.addInterest fails", done => {
+      const mockRepo = jasmine.createSpyObj("mockRepo", ["addInterest"]);
+
+      const mockReq = {
+        session: {
+          user: {
+            userID: 1,
+            username: "Renzo",
+            password: "Hello"
+          }
+        },
+        body: {}
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
+
+      const mockArgs = {
+        userID: mockReq.session.user.userID,
+        interests: mockReq.body.interests
+      };
+
+      mockRepo.addInterest.and.callFake(() => {
+        return [Promise.reject(500)];
+      });
+
+      mockRes.json.and.callFake(response => {
+        expect(mockRepo.addInterest).toHaveBeenCalledWith(mockArgs);
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(response).toEqual({
+          status: 500,
+          message: "Internal server error while adding interest"
+        });
+        done();
+      });
+
+      controller = interestsCtrl(mockRepo);
+      controller.addInterest(mockReq, mockRes);
+    });
+  });
 });
