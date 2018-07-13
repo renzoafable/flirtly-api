@@ -1,75 +1,83 @@
-const messagesCtrl = function (repo, connectionsRepo) {
+const messagesCtrl = function(repo, connectionsRepo) {
   const controller = {
     // get /message controller
     getMessages: (req, res) => {
       const { user } = req.session;
 
-      repo.getMessages(user)
+      repo
+        .getMessages(user)
         .then(results => {
-          res.status(200).json({
+          res.status(200);
+          res.json({
             status: 200,
-            message: 'Successfully fetched messages',
+            message: "Successfully fetched messages",
             data: results
           });
         })
         .catch(err => {
-          let message = '';
+          let message = "";
 
           switch (err) {
             case 500:
-              message = 'Internal server error while fetching messages';
+              message = "Internal server error while fetching messages";
               break;
             default:
               break;
           }
 
-          res.status(err).json({ status: err, message });
+          res.status(err);
+          res.json({ status: err, message });
         });
     },
     // get /message/sent controller
     getSentMessages: (req, res) => {
       const { user } = req.session;
 
-      repo.getSentMessages(user)
+      repo
+        .getSentMessages(user)
         .then(results => {
-          res.status(200).json({
+          res.status(200);
+          res.json({
             status: 200,
-            message: 'Successfully fetched sent messages',
+            message: "Successfully fetched sent messages",
             data: results
           });
         })
         .catch(err => {
-          let message = '';
+          let message = "";
 
           switch (err) {
             case 500:
-              message = 'Internal server error while fetching sent messages';
+              message = "Internal server error while fetching sent messages";
               break;
             default:
               break;
           }
 
-          res.status(err).json({ status: err, message });
+          res.status(err);
+          res.json({ status: err, message });
         });
     },
-    // get /message/received controller 
+    // get /message/received controller
     getReceivedMessages: (req, res) => {
       const { user } = req.session;
 
-      repo.getReceivedMessages(user)
+      repo
+        .getReceivedMessages(user)
         .then(results => {
           res.status(200).json({
             status: 200,
-            message: 'Successfully fetched received messages',
+            message: "Successfully fetched received messages",
             data: results
           });
         })
         .catch(err => {
-          let message = '';
+          let message = "";
 
           switch (err) {
             case 500:
-              message = 'Internal server error while fetching received messages';
+              message =
+                "Internal server error while fetching received messages";
               break;
             default:
               break;
@@ -88,29 +96,29 @@ const messagesCtrl = function (repo, connectionsRepo) {
       const receiverID = parseInt(params.userID);
       const { message } = req.body;
 
-
-      connectionsRepo.getApprovedConnectionOfUser(user, receiverID)
+      connectionsRepo
+        .getApprovedConnectionOfUser(user, receiverID)
         .then(() => {
           return repo.sendMessage(senderID, receiverID, message);
         })
         .then(() => {
           res.status(200).json({
             status: 200,
-            message: 'Successfully sent message'
+            message: "Successfully sent message"
           });
         })
         .catch(err => {
-          let message = '';
+          let message = "";
 
           switch (err) {
             case 500:
-              message = 'Internal server error while sending message';
+              message = "Internal server error while sending message";
               break;
             case 501:
-              message = 'Something went wrong';
+              message = "Something went wrong";
               break;
             case 404:
-              message = 'Contact not found';
+              message = "Contact not found";
               break;
             default:
               break;
@@ -124,20 +132,21 @@ const messagesCtrl = function (repo, connectionsRepo) {
       const { user } = req.session;
       const { connectionID } = req.params;
 
-      repo.getChats(user, connectionID)
+      repo
+        .getChats(user, connectionID)
         .then(results => {
           res.status(200).json({
             status: 200,
-            message: 'Successfully fetched chat messages',
+            message: "Successfully fetched chat messages",
             data: results
-          })
+          });
         })
         .catch(err => {
-          let message = '';
+          let message = "";
 
           switch (err) {
             case 500:
-              message = 'Internal server error while fetching chat messages';
+              message = "Internal server error while fetching chat messages";
               break;
             default:
               break;
@@ -146,9 +155,9 @@ const messagesCtrl = function (repo, connectionsRepo) {
           res.status(err).json({ status: err, message });
         });
     }
-  }
+  };
 
   return controller;
-}
+};
 
 module.exports = messagesCtrl;
