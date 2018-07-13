@@ -185,4 +185,150 @@ describe("interestsCtrl", () => {
       controller.addInterest(mockReq, mockRes);
     });
   });
+
+  describe("deleteInterest", () => {
+    it("should return status 200 if interest is successfully deleted", done => {
+      const mockRepo = jasmine.createSpyObj("mockRepo", ["deleteInterest"]);
+
+      const mockReq = {
+        session: {
+          user: {
+            userID: 1,
+            username: "Renzo",
+            password: "Password"
+          }
+        },
+        params: {
+          interestID: 1
+        }
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
+
+      mockRepo.deleteInterest.and.callFake(() => {
+        return Promise.resolve();
+      });
+
+      mockRes.json.and.callFake(response => {
+        expect(mockRepo.deleteInterest).toHaveBeenCalledWith(
+          mockReq.session.user,
+          mockReq.params.interestID
+        );
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(response).toEqual({
+          status: 200,
+          message: "Successfully deleted interest"
+        });
+        done();
+      });
+
+      controller = interestsCtrl(mockRepo);
+      controller.deleteInterest(mockReq, mockRes);
+    });
+
+    it("should return status 500 if deleteInterest fails", done => {
+      const mockRepo = jasmine.createSpyObj("mockRepo", ["deleteInterest"]);
+
+      const mockReq = {
+        session: {
+          user: {
+            userID: 1,
+            username: "Renzo",
+            password: "Password"
+          }
+        },
+        params: {
+          interestID: 1
+        }
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
+
+      mockRepo.deleteInterest.and.callFake(() => {
+        return Promise.reject(500);
+      });
+
+      mockRes.json.and.callFake(response => {
+        expect(mockRepo.deleteInterest).toHaveBeenCalledWith(
+          mockReq.session.user,
+          mockReq.params.interestID
+        );
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(response).toEqual({
+          status: 500,
+          message: "Internal server error while deleting interest"
+        });
+        done();
+      });
+
+      controller = interestsCtrl(mockRepo);
+      controller.deleteInterest(mockReq, mockRes);
+    });
+
+    it("should return status 500 if deleteInterest fails(no user signed in)", done => {
+      const mockRepo = jasmine.createSpyObj("mockRepo", ["deleteInterest"]);
+
+      const mockReq = {
+        session: {},
+        params: {
+          interestID: 1
+        }
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
+
+      mockRepo.deleteInterest.and.callFake(() => {
+        return Promise.reject(500);
+      });
+
+      mockRes.json.and.callFake(response => {
+        expect(mockRepo.deleteInterest).toHaveBeenCalledWith(
+          mockReq.session.user,
+          mockReq.params.interestID
+        );
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(response).toEqual({
+          status: 500,
+          message: "Internal server error while deleting interest"
+        });
+        done();
+      });
+
+      controller = interestsCtrl(mockRepo);
+      controller.deleteInterest(mockReq, mockRes);
+    });
+
+    it("should return status 500 if deleteInterest fails(no interestID)", done => {
+      const mockRepo = jasmine.createSpyObj("mockRepo", ["deleteInterest"]);
+
+      const mockReq = {
+        session: {
+          user: {
+            userID: 1,
+            username: "Renzo",
+            password: "Password"
+          }
+        },
+        params: {}
+      };
+      const mockRes = jasmine.createSpyObj("mockRes", ["status", "json"]);
+
+      mockRepo.deleteInterest.and.callFake(() => {
+        return Promise.reject(500);
+      });
+
+      mockRes.json.and.callFake(response => {
+        expect(mockRepo.deleteInterest).toHaveBeenCalledWith(
+          mockReq.session.user,
+          mockReq.params.interestID
+        );
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(response).toEqual({
+          status: 500,
+          message: "Internal server error while deleting interest"
+        });
+        done();
+      });
+
+      controller = interestsCtrl(mockRepo);
+      controller.deleteInterest(mockReq, mockRes);
+    });
+  });
 });

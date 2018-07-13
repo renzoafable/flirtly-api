@@ -66,7 +66,8 @@ const interestCtrl = function(repo) {
       repo
         .deleteInterest(user, interestID)
         .then(() => {
-          res.status(200).json({
+          res.status(200);
+          res.json({
             status: 200,
             message: "Successfully deleted interest"
           });
@@ -76,13 +77,14 @@ const interestCtrl = function(repo) {
 
           switch (err) {
             case 500:
-              message = "Internal server erro while deleting interest";
+              message = "Internal server error while deleting interest";
               break;
             default:
               break;
           }
 
-          res.status(err).json({ status: err, message });
+          res.status(err);
+          res.json({ status: err, message });
         });
     }
   };
