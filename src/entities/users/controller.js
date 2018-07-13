@@ -44,8 +44,6 @@ const userCtrl = function(repo, connectionsRepo) {
           receivedConnections = receivedConnections.map(connection => connection.userID);
           connections = connections.map(connection => connection.connectionID);
 
-          console.log(connections);
-
           users = users.filter(user => !sentConnections.includes(user.userID));
           users = users.filter(user => !receivedConnections.includes(user.userID));
           users = users.filter(user => !connections.includes(user.userID));

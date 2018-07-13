@@ -285,6 +285,3 @@ CALL addUser("dabenavidez", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiP
 CALL addUser("mark", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Mark", "", "Aldecimo", "09178774953", "mark@up.edu.ph", "male", "Calamba City", "Laguna");
 CALL addUser("carlo", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Carlo", "", "De Guzman", "09178774953", "carlo@up.edu.ph", "male", "Calamba City", "Laguna");
 CALL addUser("ej", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "EJ", "", "Villadarez", "09178774953", "ej@up.edu.ph", "female", "Calamba City", "Laguna");
-CALL addUser("jerome", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Jerome", "", "Davadilla", "09178774953", "jerome@up.edu.ph", "male", "Calamba City", "Laguna");
-CALL addUser("pduts", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Rodrigo", "", "Duterte", "09178774953", "pduts@up.edu.ph", "male", "Calamba City", "Laguna");
-CALL addUser("liza", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Liza", "", "Soberano", "09178774953", "liza@up.edu.ph", "female", "Calamba City", "Laguna");
