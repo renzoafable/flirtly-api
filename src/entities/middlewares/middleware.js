@@ -1,13 +1,14 @@
-const middlewares = function () {
+const middlewares = function() {
   const mw = {
     isLoggedIn: (req, res, next) => {
       if (req.session.user) {
         return next();
       }
 
-      res.status(401).json({
+      res.status(401);
+      res.json({
         status: 401,
-        message: 'You must be logged in'
+        message: "You must be logged in"
       });
     },
 
@@ -18,14 +19,15 @@ const middlewares = function () {
         return next();
       }
 
-      res.status(403).json({
+      res.status(403);
+      res.json({
         status: 403,
-        message: 'Cannot perform action with user'
+        message: "Cannot perform action with user"
       });
     }
-  }
+  };
 
   return mw;
-}
+};
 
 module.exports = middlewares;
