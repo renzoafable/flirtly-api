@@ -9,7 +9,7 @@ const queries = {
     SELECT c.connectionID, u.firstName, u.lastName, c.dateAdded
     FROM connections c LEFT JOIN users u
     ON c.connectionID = u.userID
-    WHERE c.userID = ? AND c.confirmed = 1 
+    WHERE c.userID = ? AND c.confirmed = 1
   `,
   getConnectionOfUser: `
     SELECT * FROM connections WHERE userID=? AND connectionID=? AND confirmed=0
@@ -21,13 +21,16 @@ const queries = {
     CALL getAllConnections(?,?)
   `,
   getSentConnections: `
-    SELECT c.connectionID, u.firstName, u.lastName, c.confirmed, c.dateAdded 
+    SELECT c.connectionID, u.firstName, u.lastName, c.confirmed, c.dateAdded
     FROM connections c LEFT JOIN users u
     ON c.connectionID = u.userID
     WHERE c.userID=? AND c.confirmed = 0
   `,
   getReceivedConnections: `
-    SELECT userID, userName, confirmed, dateAdded FROM connections WHERE connectionID=? and confirmed = 0
+    SELECT c.userID, u.firstName, u.lastName, c.confirmed, c.dateAdded
+    FROM connections c LEFT JOIN users u
+    ON c.userID = u.userID
+    WHERE c.connectionID = ? and confirmed = 0
   `,
   approveReceivedConnections: `
     CALL approveReceivedConnection(?,?)

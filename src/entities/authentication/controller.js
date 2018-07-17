@@ -1,8 +1,6 @@
-const bcrypt = require('bcrypt');
-
-const authCtrl = function (repo) {
+const authCtrl = function (repo, bcrypt) {
   const controller = {
-    // /signin controller
+    // post /signin controller
     signin: (req, res) => {
       if (req.session.user) {
         res.status(403).json({
@@ -35,6 +33,8 @@ const authCtrl = function (repo) {
               case 400:
                 message = 'Invalid credentials';
                 break;
+              case 404:
+                message = 'User not found';
               default:
                 break;
             }
@@ -44,7 +44,7 @@ const authCtrl = function (repo) {
       }
     },
 
-    // /signup controller
+    // post /signup controller
     signup: (req, res) => {
       let user;
 
@@ -87,7 +87,7 @@ const authCtrl = function (repo) {
       });
     },
 
-    // /signout controller
+    // post /signout controller
     signout: (req, res) => {
       if (!req.session.user) {
         res.status(400).json({
@@ -106,7 +106,7 @@ const authCtrl = function (repo) {
       }
     },
 
-    //  /session controller
+    //  post /session controller
     getSession: (req, res) => {
       res.status(200).json({
         status: 200,

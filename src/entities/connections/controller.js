@@ -1,135 +1,247 @@
-const db = require('../../database/index');
-const connectionQueries = require('./queries');
+const connectionsCtrl = function (repo, authRepo) {
+  const controller = {
+    // get / controller
+    getConnectionsOfUser: (req, res) => {
+      const { user } = req.session;
 
-exports.requestConnection = function(userID, connectionID) {
-  return new Promise((resolve, reject) => {
-    db.query(connectionQueries.requestConnection, [userID, connectionID], (err, result) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-      return resolve(result[0]);
-    });
-  });
+      repo.getConnectionsOfUser(user)
+        .then(result => {
+          result.map(user => {
+            user.chatColor = Math.floor(Math.random() * 16777215).toString(16);
+          })
+
+          res.status(200).json({
+            status: 200,
+            message: 'Successfully fetched user connections',
+            data: result
+          });
+        })
+        .catch(err => {
+          let message = '';
+
+          switch (err) {
+            case 500:
+              message = 'Internal server error while fetchin user connections';
+              break;
+            default:
+              break;
+          }
+
+          res.status(err).json({ status: err, message });
+        });
+    },
+    // post /send/:connectionID controller
+    requestConnection: (req, res) => {
+      const { userID } = req.session.user;
+      let connectionID = parseInt(req.params.userID);
+
+      let user;
+      authRepo.getUserByUserID(connectionID)
+        .then(user => {
+          if (user) {
+            user = user;
+            return repo.getAllConnections(userID, connectionID);
+          }
+        })
+        .then(result => {
+          if (result.length) {
+            return Promise.reject(403);
+          }
+          else return repo.requestConnection(userID, connectionID);
+        })
+        .then(result => {
+          res.status(200).json({
+            status: 200,
+            message: 'Successfully sent connection request',
+            data: result
+          });
+        })
+        .catch(err => {
+          let message = '';
+
+          switch (err) {
+            case 500:
+              message = 'Internal server error while fetching requested user';
+              break;
+            case 404:
+              message = 'User not found';
+              break;
+            case 403:
+              message = 'Request have been sent or established already';
+              break;
+            default:
+              break;
+          }
+
+          res.status(err).json({ status: err, message });
+        });
+    },
+    // put /approve/:userID controller
+    approveReceivedConnections: (req, res) => {
+      const { user } = req.session;
+      let { userID } = req.params;
+      userID = parseInt(userID);
+
+      repo.getPendingRequest(user.userID, userID)
+        .then(result => {
+          if (result) {
+            receivedConnection = result;
+            return repo.approveReceivedConnections(user, userID);
+          }
+
+          return Promise.reject(404);
+        })
+        .then(() => {
+          return repo.getReceivedConnections(user);
+        })
+        .then(result => {
+          res.status(200).json({
+            status: 200,
+            message: 'Successfully approved connection request',
+            data: result
+          });
+        })
+        .catch(err => {
+          let message = '';
+
+          switch (err) {
+            case 500:
+              message = 'Internal server error while approving connection request';
+              break;
+            case 404:
+              message = 'Connection request not found';
+              break;
+            default:
+              break;
+          }
+
+          res.status(err).json({ status: err, message });
+        });
+    },
+    // get /sent controller
+    getSentConnections: (req, res) => {
+      const { user } = req.session;
+      repo.getSentConnections(user)
+        .then(result => {
+          res.status(200).json({
+            status: 200,
+            message: 'Successfully fetched sent connection requests',
+            data: result
+          });
+        })
+        .catch(err => {
+          let message = '';
+
+          switch (err) {
+            case 500:
+              message = 'Internal server error while fetching sent connection requests';
+              break;
+            default:
+              break;
+          }
+
+          res.status(err).json({ status: err, message });
+        });
+    },
+    // get /received controller
+    getReceivedConnections: (req, res) => {
+      const { user } = req.session;
+      repo.getReceivedConnections(user)
+        .then(result => {
+          res.status(200).json({
+            status: 200,
+            message: 'Successfully fetched received connection requests',
+            data: result || null
+          });
+        })
+        .catch(err => {
+          let message = '';
+
+          switch (err) {
+            case 500:
+              message = 'Internal server error while fetching received connection requests';
+              break;
+            default:
+              break;
+          }
+
+          res.status(err).json({ status: err, message });
+        });
+    },
+    // delete /sent/delete/:connectionID controller
+    deleteSentRequest: (req, res) => {
+      const { user } = req.session;
+      const { connectionID } = req.params;
+
+      repo.getConnectionOfUser(user, connectionID)
+        .then(result => {
+          const { userID, connectionID } = result;
+
+          return repo.deleteRequest(userID, connectionID);
+        })
+        .then(() => {
+          return repo.getSentConnections(user);
+        })
+        .then(result => {
+          res.status(200).json({
+            status: 200,
+            message: 'Successfully canceled request',
+            data: result
+          });
+        })
+        .catch(err => {
+          let message = '';
+
+          switch (err) {
+            case 500:
+              message = 'Internal server error while deleting request';
+              break;
+            case 404:
+              message = 'Connection does not exist';
+              break;
+          }
+
+          res.status(err).json({ status: err, message });
+        });
+    },
+    // delete /received/delete/:connectionID controller
+    deleteReceivedRequest: (req, res) => {
+      const { user } = req.session;
+      const { userID } = req.params;
+
+      repo.getConnectionOfUser({ userID }, user.userID)
+        .then(result => {
+          const { userID, connectionID } = result;
+
+          return repo.deleteRequest(userID, connectionID);
+        })
+        .then(() => {
+          return repo.getReceivedConnections(user);
+        })
+        .then(result => {
+          res.status(200).json({
+            status: 200,
+            message: 'Successfully deleted pending request',
+            data: result
+          })
+        })
+        .catch(err => {
+          let message = '';
+
+          switch (err) {
+            case 500:
+              message = 'Iternal server error while deleting request';
+              break;
+            default:
+              break;
+          }
+
+          res.status(err).json({ status: err, message });
+        });
+    }
+  }
+
+  return controller;
 }
 
-exports.getAllConnections = function(userID, connectionID) {
-  return new Promise((resolve, reject) => {
-    db.query(connectionQueries.getAllConnections, [userID, connectionID],
-      (err, result) => {
-        if (err) {
-          console.log(err.message);
-          return reject(500);
-        }
-        return resolve(result[0]);
-      });
-  });
-}
-
-exports.getSentConnections = function({userID}) {
-  return new Promise((resolve, reject) => {
-    db.query(connectionQueries.getSentConnections, userID, (err, results) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-      
-      return resolve(results);
-    });
-  });
-}
-
-exports.getReceivedConnections = function({userID}) {
-  return new Promise((resolve, reject) => {
-    db.query(connectionQueries.getReceivedConnections, userID, (err, results) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-
-      return resolve(results);
-    });
-  });
-}
-
-exports.getConnectionsOfUser = function({userID}) {
-  return new Promise((resolve, reject) => {
-    db.query(connectionQueries.getConnectionsOfUser, [userID, userID], (err, results) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-
-      return resolve(results);
-    });
-  });
-}
-
-exports.getConnectionOfUser = function({userID: senderID}, receiverID) {
-  return new Promise((resolve, reject) => {
-    db.query(connectionQueries.getConnectionOfUser, [senderID, receiverID], (err, result) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-    
-      else if(!result.length) return reject(404);
-
-      return resolve(result[0]);
-    });
-  });
-}
-
-exports.getApprovedConnectionOfUser = function({userID: senderID}, receiverID) {
-  return new Promise((resolve, reject) => {
-    db.query(connectionQueries.getApprovedConnection, [senderID, receiverID], (err, result) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-    
-      else if(!result.length) return reject(404);
-
-      return resolve(result[0]);
-    });
-  });
-}
-
-exports.approveReceivedConnections = function({userID: receiverID}, senderID) {
-  return new Promise((resolve, reject) => {
-    db.query(connectionQueries.approveReceivedConnections, [receiverID, senderID], (err, results) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-
-      return resolve(results);
-    });
-  });
-}
-
-exports.getPendingRequest = function(connectionID, userID) {
-  return new Promise((resolve, reject) => {
-    db.query(connectionQueries.getPendingRequest, [connectionID, userID], (err, results) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-
-      return resolve(results[0]);
-    });
-  });
-}
-
-exports.deleteRequest = function(userID, connectionID) {
-  return new Promise((resolve, reject) => {
-    db.query(connectionQueries.deleteConnection, [userID, connectionID], (err, result) => {
-      if (err) {
-        console.log(err.message);
-        return reject(500);
-      }
-
-      return resolve(result);
-    })
-  });
-}
+module.exports = connectionsCtrl;

@@ -11,7 +11,7 @@ GRANT SUPER ON *.* TO 'flirtly'@'localhost';
 GRANT ALL PRIVILEGES ON flirtly.* TO 'flirtly'@'localhost';
 
 -- Tables
-/* 
+/*
   users table contains all users registered in the app
 */
 
@@ -54,7 +54,7 @@ CREATE TABLE interests (
     PRIMARY KEY (interestID)
 );
 
-/* 
+/*
   connections table contains all user selected connections
   these are the users that the selected user wanted to match with
 */
@@ -85,10 +85,12 @@ CREATE TABLE messages (
   timeSent TIMESTAMP NOT NULL,
   CONSTRAINT `user_senderID_fk`
     FOREIGN KEY (senderID)
-    REFERENCES users(userID),
+    REFERENCES users(userID)
+    ON DELETE CASCADE,
   CONSTRAINT `user_receiverID_fk`
     FOREIGN KEY (receiverID)
     REFERENCES users(userID)
+    ON DELETE CASCADE
 );
 
 -- TODO:
@@ -160,7 +162,7 @@ CREATE PROCEDURE requestConnection (
   connectionID INT
 )
 BEGIN
-  INSERT INTO connections 
+  INSERT INTO connections
   VALUES (
     userID,
     (select username from users where users.userID = userID),
@@ -181,7 +183,7 @@ CREATE PROCEDURE getAllConnections (
   connectionID INT
 )
 BEGIN
-  SELECT * FROM connections WHERE (connections.userID=userID or connections.connectionID=userID) 
+  SELECT * FROM connections WHERE (connections.userID=userID or connections.connectionID=userID)
   AND (connections.userID=connectionID or connections.connectionID=connectionID);
 END;
 $$
@@ -194,7 +196,7 @@ CREATE PROCEDURE getPendingConnections (
   connectionID INT
 )
 BEGIN
-  SELECT * FROM connections WHERE (connections.userID=userID or connections.connectionID=userID) 
+  SELECT * FROM connections WHERE (connections.userID=userID or connections.connectionID=userID)
   AND (connections.userID=connectionID or connections.connectionID=connectionID) AND confirmed=0;
 END;
 $$
@@ -208,7 +210,7 @@ CREATE PROCEDURE approveReceivedConnection (
 )
 BEGIN
   UPDATE connections
-  SET confirmed=TRUE 
+  SET confirmed=TRUE
   WHERE connections.userID=userID AND connections.connectionID=connectionID;
   INSERT INTO connections
   VALUES  (
@@ -247,14 +249,11 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS getUsers;
 DELIMITER $$
 CREATE PROCEDURE getUsers (
-  userID INT
+  ID INT
 )
 BEGIN
-  SELECT DISTINCT u.*, c.confirmed 
-  FROM users u 
-  LEFT JOIN connections c 
-  ON u.userID = c.connectionID
-  WHERE u.userID != userID;
+  SELECT * FROM users
+  WHERE userID != ID;
 END;
 $$
 DELIMITER ;
@@ -267,7 +266,7 @@ CREATE PROCEDURE getChats (
 )
 BEGIN
   SELECT * FROM messages
-  WHERE messages.senderID IN (userID, connectionID) 
+  WHERE messages.senderID IN (userID, connectionID)
   AND messages.receiverID IN (userID, connectionID)
   ORDER BY messages.timeSent;
 END;
@@ -286,6 +285,3 @@ CALL addUser("dabenavidez", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiP
 CALL addUser("mark", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Mark", "", "Aldecimo", "09178774953", "mark@up.edu.ph", "male", "Calamba City", "Laguna");
 CALL addUser("carlo", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Carlo", "", "De Guzman", "09178774953", "carlo@up.edu.ph", "male", "Calamba City", "Laguna");
 CALL addUser("ej", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "EJ", "", "Villadarez", "09178774953", "ej@up.edu.ph", "female", "Calamba City", "Laguna");
-CALL addUser("jerome", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Jerome", "", "Davadilla", "09178774953", "jerome@up.edu.ph", "male", "Calamba City", "Laguna");
-CALL addUser("pduts", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Rodrigo", "", "Duterte", "09178774953", "pduts@up.edu.ph", "male", "Calamba City", "Laguna");
-CALL addUser("liza", "$2b$10$Y9QucWhUxLClZgycdcb8X.9jk92RNeIoSyCpPTjXohiPa80vp/K.i", "Liza", "", "Soberano", "09178774953", "liza@up.edu.ph", "female", "Calamba City", "Laguna");

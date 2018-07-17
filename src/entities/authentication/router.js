@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 
 const db = require('../../database/index');
-const queries = require('./queries');
 
 // Inject dependencies
-const authRepo = require('./repo')(db, queries);
-const authCtrl = require('./controller')(authRepo);
+const authRepo = require('./repo')(db);
+const authCtrl = require('./controller')(authRepo, bcrypt);
 
 router.post('/signin', authCtrl.signin);
 router.post('/signup', authCtrl.signup);
