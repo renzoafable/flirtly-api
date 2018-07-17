@@ -7,9 +7,21 @@ const cors = require('cors');
 const db = require('./database');
 const router = require('./router');
 
-const app = express();
 const MySQLStore = store(session);
 const sessionStore = new MySQLStore({}, db);
+
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+
+io.on('connection', socket => {
+  console.log('user connected');
+
+  socket.on('message', (message) => {
+    console.log("Message Received: " + message);
+    socket.emit('message', message);
+  });
+});
 
 // middlewares
 app.use(morgan('dev'));
@@ -39,6 +51,6 @@ app.use('*', (req, res) => res.redirect('/'));
 
 // listen to port
 const port = process.env.PORT || 3001;
-app.listen(port, () => {
+http.listen(port, () => {
   console.log(`Server is listening to port ${port}`);
 });
