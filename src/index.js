@@ -15,11 +15,10 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
 io.on('connection', socket => {
-  console.log('user connected');
-
+  console.log('User connected');
   socket.on('message', (message) => {
-    console.log("Message Received: " + message);
-    socket.emit('message', message);
+    socket.broadcast.emit(`message/${message.senderID}`, message);
+    socket.broadcast.emit(`message/${message.receiverID}`, message);
   });
 });
 

@@ -6,10 +6,6 @@ const connectionsCtrl = function (repo, authRepo) {
 
       repo.getConnectionsOfUser(user)
         .then(result => {
-          result.map(user => {
-            user.chatColor = Math.floor(Math.random() * 16777215).toString(16);
-          })
-
           res.status(200).json({
             status: 200,
             message: 'Successfully fetched user connections',
