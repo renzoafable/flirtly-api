@@ -22,3 +22,6 @@ A web-based dating application.
 - [Yarn](https://classic.yarnpkg.com/en/) - Dependency Management
 - [MySQL](https://www.mysql.com/downloads/) - The databased used.
 - [SocketIO](https://socket.io) - Web Sockets.
+
+## Client
+The source code for the client can be found [here](https://github.com/renzoafable/flirtly-client).
